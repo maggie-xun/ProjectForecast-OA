@@ -1,0 +1,95 @@
+﻿@model LoginViewModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Projec Forecase OA System</title>
+
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="/Templates/css/stylesheets.css" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript" src="/Templates/js/plugins/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="/Templates/js/plugins/jquery/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/Templates/js/plugins/jquery/jquery-migrate.min.js"></script>
+    <script type="text/javascript" src="/Templates/js/plugins/jquery/globalize.js"></script>
+    <script type="text/javascript" src="/Templates/js/plugins/bootstrap/bootstrap.min.js"></script>
+
+    <script type="text/javascript" src="/Templates/js/plugins/uniform/jquery.uniform.min.js"></script>
+
+    <script type="text/javascript" src="/Templates/js/plugins.js"></script>
+    <script type="text/javascript" src="/Templates/js/actions.js"></script>
+</head>
+
+<body class="bg-img-num1">
+    <div class="container">
+        <div class="login-block">
+            <div class="block block-transparent">
+                <div class="head">
+                    <div class="user">
+                        <div class="info">
+                            <img src="/Templates/img/logo.jpg" class="img-circle img-thumbnail" />
+                        </div>
+                    </div>
+                </div>
+                <div class="content controls npt">
+                    @using (Html.BeginForm("Login", "Account", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { role = "form" }))
+                    {
+                        @*@Html.AntiForgeryToken()*@
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span class="icon-user"></span>
+                                    </div>
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "Login" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span class="icon-key"></span>
+                                    </div>
+                                    @Html.PasswordFor(m => m.Password, new { @class = "form-control", placeholder = "Password" })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <div class="checkbox-inline">
+                                    @Html.CheckBoxFor(m => m.RememberMe)
+                                    @Html.LabelFor(m => m.RememberMe)
+                                </div>
+                                <div class="checkbox-inline" style="float:right;width:100px">
+                                    <a href="@Url.Action("Signup","Account")">
+
+                                        <input value="Sign up" class="btn btn-default btn-block btn-clean" />
+                                    </a>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <input type="submit" value="Log in" class="btn btn-default btn-block btn-clean" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
