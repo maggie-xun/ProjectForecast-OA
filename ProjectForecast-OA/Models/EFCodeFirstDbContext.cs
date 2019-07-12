@@ -16,9 +16,10 @@ namespace ProjectForecast_OA.Models
 
         }
         public DbSet<Users> Users{ get; set; }
-        public DbSet<Employee> Employees { get; set; }
+        public DbSet<Consultant> Employees { get; set; }
         public DbSet<Project> projects { get; set; }
-        //public DbSet<ProjectCost> projectCosts { get; set; }
-        //public DbSet<ProjectEmployee> projectEmployees { get; set; }
+        public DbSet<Consultant_Workday_Details> Consultant_Workday_Details { get; set; }
+        public DbSet<Project_Financial_Report> ProjectCosts { get; set; }
+        public DbSet<Country> Country { get; set; }
     }
 }

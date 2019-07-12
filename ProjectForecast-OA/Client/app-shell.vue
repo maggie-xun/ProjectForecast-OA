@@ -11,23 +11,19 @@
                         </el-menu-item>
 
                         <template slot="title"> </template>
-                        <el-menu-item index="employee_add">
-                            <router-link to="/employee_add">Add Project</router-link>
+                        <el-menu-item index="project_add">
+                            <router-link to="/project_add">Add Project</router-link>
                         </el-menu-item>
                         <template slot="title"> </template>
-                        <el-menu-item index="employee_add">
-                            <router-link to="/employee_add">Add From Excel</router-link>
+                        <el-menu-item index="project_addFromExcel">
+                            <router-link to="/project_addFromExcel">Add From Excel</router-link>
                         </el-menu-item>
                     </el-submenu>
-                    <el-submenu index="2">
-                        <template slot="title">Employee Managment</template>
-                        <el-submenu index="2-4">
-                            <template slot="title">
-                                <el-menu-item index="employee_add">
-                                    <router-link to="/employee_add">Add Empoyee</router-link>
-                                </el-menu-item>
-                            </template>
-                        </el-submenu>
+                    <el-submenu index="employee_add">
+                        <template slot="title">Empoyee Managment</template>
+                        <el-menu-item index="employee_add">
+                            <router-link to="/employee_add">Add Empoyee</router-link>
+                        </el-menu-item>                    
                     </el-submenu>
                     <el-menu-item index="3" disabled>CRM</el-menu-item>
                     <el-menu-item index="4"><a href="https://www.ele.me" target="_blank">Overview</a></el-menu-item>

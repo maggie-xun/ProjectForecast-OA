@@ -6,12 +6,11 @@ using System.Web;
 
 namespace ProjectForecast_OA.Models
 {
-    public class Users
+    public class Consultant_CostRate
     {
         [Key]
-        public string UserName { get; set; }
-        public string PassWord { get; set; }
-        public string Region { get; set; }
-
+        public int Consultant_ID { get; set; }
+        public string UpdatedTime{ get; set; }
+        public int CostRate { get; set; }
     }
 }

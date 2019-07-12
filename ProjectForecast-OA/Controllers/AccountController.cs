@@ -34,14 +34,14 @@ namespace ProjectForecast_OA.Controllers
                 return View(model);
             }
             EFCodeFirstDbContext context = new EFCodeFirstDbContext();
-            var valid_users = CovertJsonToDocument<List<UserViewModel>>(this.AbsoluteDataFile("users.json")).FirstOrDefault();
-            //var valid_users = context.Users.Select(user => user.UserName == model.Name && user.PassWord == model.Password);
+            //var valid_users = CovertJsonToDocument<List<UserViewModel>>(this.AbsoluteDataFile("users.json")).FirstOrDefault();
+            var valid_users = context.Users.Select(x=>x).Where(user => user.UserName == model.Name && user.PassWord == model.Password).FirstOrDefault();
             //var login_user = valid_users.FirstOrDefault(x => model.Name.Equals(x.Account) && model.Password.Equals(x.Password));
             if (valid_users != null)
             {
                 var claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, valid_users.Account));
-                claims.Add(new Claim(ClaimTypes.Name, valid_users.Name));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, valid_users.UserName));
+                claims.Add(new Claim(ClaimTypes.Name, valid_users.PassWord));
 
                 var identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
 
@@ -82,7 +82,12 @@ namespace ProjectForecast_OA.Controllers
             {
                 EFCodeFirstDbContext context = new EFCodeFirstDbContext();
 
-                Users user = new Users(model.Name, model.Password, model.Country);
+                Users user = new Users()
+                {
+                    UserName=model.Name,
+                    PassWord=model.Password,
+                    Region=model.Country
+                };
                 context.Users.Add(user);
                 context.SaveChanges();
                 return RedirectToLocal(returnUrl);
