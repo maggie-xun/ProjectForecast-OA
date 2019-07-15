@@ -4,7 +4,7 @@
   "description": "A Vue.js project",
   "author": "Hainan",
   "private": true,
-  "scripts": {
+  "scripts":  {
     "buildDev": "webpack --color",
     "watch": "webpack --watch",
     "buildProd": "SET NODE_ENV=production && webpack -p --color"
