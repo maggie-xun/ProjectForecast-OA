@@ -4,12 +4,12 @@
 
             <el-form ref="form" :model="form" label-width="120px">
                 <el-form-item label="Consultant Name">
-                    <el-input v-model="form.Name"></el-input>
+                    <el-input v-model="form.Consultant_Name"></el-input>
                 </el-form-item>
                 <el-form-item label="Type">
                     <el-select v-model="form.Type" placeholder="">
-                        <el-option label="区域一" value="shanghai"></el-option>
-                        <el-option label="区域二" value="beijing"></el-option>
+                        <el-option label="HC" value="HC"></el-option>
+                        <el-option label="EX" value="EX"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Cost Rate">
@@ -17,8 +17,8 @@
                 </el-form-item>
                 <el-form-item label="Hire Decision">
                     <el-select v-model="form.HireDecision" placeholder="">
-                        <el-option label="区域一" value="shanghai"></el-option>
-                        <el-option label="区域二" value="beijing"></el-option>
+                        <el-option label="Yes" value="Yes"></el-option>
+                        <el-option label="No" value="No"></el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item>
@@ -55,6 +55,9 @@
             onSubmit() {
                 console.log(formData_service);
                 formData_service.default.addEmployee.extc(this.form)
+                .then(()=>{
+                    this.$message('Add Successful!');
+                })
             }
         }
     }

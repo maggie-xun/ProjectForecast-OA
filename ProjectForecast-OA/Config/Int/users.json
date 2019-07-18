@@ -1,32 +1,3 @@
 ﻿[
-  {
-    "account": "athson",
-    "password": "123456",
-    "name": "Tester - Athson"
-  },
-  {
-    "account": "mseditor",
-    "password": "u2UrLnDZ8vC2",
-    "name": "MS Editor - INT"
-  },
-  {
-    "account": "v-wew",
-    "password": "r6u1RPanU482",
-    "name": "Athson Wang"
-  },
-  {
-    "account": "yewei",
-    "password": "I3xL9fvGuI6W",
-    "name": "Ye Wei"
-  },
-  {
-    "account": "gaohui",
-    "password": "i27vZFUU1ono",
-    "name": "Gao Hui"
-  },
-  {
-    "account": "zhengyuncheng",
-    "password": "KaqB1YilTD1F",
-    "name": "Zhengyun Cheng"
-  }
+  
 ]

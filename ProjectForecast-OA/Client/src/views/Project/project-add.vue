@@ -16,9 +16,16 @@
                         <el-form-item label="Project Name">
                             <el-input v-model="form.ProjectName"></el-input>
                         </el-form-item>
+                            <el-form-item label="Project Manager">
+                                    <el-select v-model="form.Consultant.Consultant_Name" placeholder="">
+                                        <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_ID" v-for='consultant in consultants'></el-option>
+                                    </el-select>
+                                </el-form-item>
                         <el-form-item label="Customer">
-                            <el-input v-model="form.Customer"></el-input>
-                        </el-form-item>
+                                <el-select v-model="form.Customer" placeholder="">
+                                    <el-option :label="customer.Customer_name" :value="customer.CustomerId" v-for='customer in customers'></el-option>
+                                </el-select>
+                            </el-form-item>
                         <el-form-item label="Type">
                             <el-select v-model="form.Type" placeholder="">
                                 <el-option label="P" value="P"></el-option>
@@ -28,8 +35,10 @@
                         </el-form-item>
                         <el-form-item label="Status">
                             <el-select v-model="form.Status" placeholder="">
-                                <el-option label="区域一" value="shanghai"></el-option>
-                                <el-option label="区域二" value="beijing"></el-option>
+                                <el-option label="Scheduled" value="Scheduled"></el-option>
+                                <el-option label="Ongoning" value="Ongoning"></el-option>
+                                <el-option label="Completed" value="Completed"></el-option>
+                                <el-option label="Cancelled" value="Cancelled"></el-option>
                             </el-select>
                         </el-form-item>
                         <el-form-item label="CloseDate">
@@ -47,16 +56,16 @@
                 <el-tab-pane label="Utilization" name="second">
                     <span class="demonstration">Select Consultants: </span>
                     <el-checkbox-group v-model="checkList" style="display:inline-block">
-                        <el-checkbox :label="employee.Name" v-for='employee in allEmployees'></el-checkbox>
+                        <el-checkbox :label="employee.Consultant_Name" v-for='employee in consultants'></el-checkbox>
                     </el-checkbox-group>
-                    <span v-if='allEmployees.length<=0'>
+                    <span v-if='consultants.length<=0'>
                         Please Add Employee First
                     </span>
 
                     <div class="block">
                         <span class="demonstration" style="display:inline-block">Select Time Span: </span>
                         <el-date-picker v-model="timeSpan" type="daterange" range-separator="To"
-                            start-placeholder="Start" end-placeholder="End">
+                            start-placeholder="Start" end-placeholder="End" @change='changeUtilizationTimeSpan'>
                         </el-date-picker>
                         <el-button type="primary" @click="AddEmployee">AddEmployee</el-button>
                     </div>
@@ -149,11 +158,13 @@
     export default {
         data() {
             return {
-                form: { CloseDate: '' },
+                form: {  },
                 CloseDate: '',
                 activeName: 'first',
                 checkList: [],
-                allEmployees: [],
+                consultants: [],
+                customers:[],
+                consultants:[],
                 timeSpan: '',
                 FinancialReportTimeSpan: [],
                 infiledList: [],
@@ -168,19 +179,27 @@
         created() {
             formData_service.default.getAllEmployee.extc()
                 .then(data => {
-                    this.allEmployees = data.data;
+                    this.consultants = data.data;
                 });
-            formData_service.default.getAllCountry.extc()
+                formData_service.default.getAllCountry.extc()
                 .then(data => {
                     this.Country = data.data;
                 });
-
+                formData_service.default.getAllCustomer.exec()
+                .then((data)=>{
+                    this.customers=data.data;
+                })
         },
         computed: {
-
+           
         },
         watch: {
-
+            Country:function(){
+                formData_service.default.getAllCountry.extc()
+                .then(data => {
+                    this.Country = data.data;
+                });
+            }
         },
         methods: {
             NextPage(){
@@ -196,50 +215,30 @@
             addRow(tableData, event) {
                 tableData.push({ fildna: '', fildtp: '', remark: '' })
             },
-            AddEmployee() {
-                let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
-
-                let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-                for (let i = startMonth; i < endMonth + 1; i++) {
-                    this.months.push(i + '');
-                }
-
-                this.checkList.forEach(element => {
-                    this.allEmployees.forEach(employee => {
-                        if (employee.Name == element) {
-                            let MonthElement = []
-                            this.months.forEach(month => {
-                                MonthElement.push({ Month: month, WorkingHour: '' })
-
-                            })
-                            this.infiledList.push({
-                                EmployeeId: employee.EmployeeId,
-                                Name: employee.Name, Type: employee.Type, CostRate: employee.CostRate, MonthElement: MonthElement
-                            })
-                        }
-                    })
-
-                });
-            },
             open() {
                 this.$prompt('Please input the country name', '', {
                     confirmButtonText: 'Add',
                     cancelButtonText: 'Cancle',
                 }).then(({ value }) => {
                     formData_service.default.addCountry.extc({ CountryName: value })
-                }).catch(() => {
+                }).then((data) => {
+                   this.Country.push("");
+                   
+                }).catch((err) => {
+                    console.log(err);
                     this.$message({
                         type: 'info',
                         message: 'Cancled'
                     });
-                });
+                })
             },
-
+            
             AddProject() {
                 let project = this.form;
                 project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
                 project.Employees = [];
                 project.ProjectFinancList = [];
+                project.Country = {CountryId:this.form.Country};
                 this.infiledList.forEach(element => {
                     this.months.forEach(month => {
                         let workingHour;
@@ -277,7 +276,31 @@
                 for (let i = startMonth; i < endMonth + 1; i++) {
                     this.FinancialReport.push({ Month: i + '' });
                 }
-            }
+            },
+            changeUtilizationTimeSpan() {
+                    let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
+
+                    let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
+                    for (let i = startMonth; i <= endMonth; i++) {
+                        this.months.push(this.MonthMapping(i + ''));
+                    }
+
+                    this.checkList.forEach(element => {
+                        this.consultants.forEach(employee => {
+                            if (employee.Consultant_Name == element) {
+                                let MonthElement = []
+                                this.months.forEach(month => {
+                                    MonthElement.push({ Month: month, WorkingHour: '' })
+                                })
+                                this.infiledList.push({
+                                    EmployeeId: employee.EmployeeId,
+                                    Consultant_Name: employee.Consultant_Name, Type: employee.Type, CostRate: employee.CostRate, MonthElement: MonthElement
+                                })
+                            }
+                        })
+
+                    });
+                }
         }
     }
 </script>

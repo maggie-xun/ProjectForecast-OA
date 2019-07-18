@@ -71,12 +71,12 @@
                                     @Html.CheckBoxFor(m => m.RememberMe)
                                     @Html.LabelFor(m => m.RememberMe)
                                 </div>
-                                <div class="checkbox-inline" style="float:right;width:100px">
-                                    <a href="@Url.Action("Signup","Account")">
+                                <div class="checkbox-inline" style="float:right;width:100px;border:1px solid #FFF;border-radius:4px">
+                                    @*<a href="@Url.Action("Signup","Account")">
 
-                                        <input value="Sign up" class="btn btn-default btn-block btn-clean" />
-                                    </a>
-
+            <input value="Sign up" class="btn btn-default btn-block btn-clean" />
+        </a>*@
+                                    <a href="@Url.Action("Signup","Account")">Sign up</a>
                                 </div>
                             </div>
                         </div>
