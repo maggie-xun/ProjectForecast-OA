@@ -198,6 +198,18 @@
     <Compile Include="Migrations\201907180658403_0718-2.Designer.cs">
       <DependentUpon>201907180658403_0718-2.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201907190240471_0719.cs" />
+    <Compile Include="Migrations\201907190240471_0719.Designer.cs">
+      <DependentUpon>201907190240471_0719.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201907190644490_0719-2.cs" />
+    <Compile Include="Migrations\201907190644490_0719-2.Designer.cs">
+      <DependentUpon>201907190644490_0719-2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201907190718414_0719-3.cs" />
+    <Compile Include="Migrations\201907190718414_0719-3.Designer.cs">
+      <DependentUpon>201907190718414_0719-3.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Consultant_CostRate.cs" />
     <Compile Include="Models\Consultant_Schedule.cs" />
@@ -18322,6 +18334,15 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201907180658403_0718-2.resx">
       <DependentUpon>201907180658403_0718-2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907190240471_0719.resx">
+      <DependentUpon>201907190240471_0719.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907190644490_0719-2.resx">
+      <DependentUpon>201907190644490_0719-2.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201907190718414_0719-3.resx">
+      <DependentUpon>201907190718414_0719-3.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

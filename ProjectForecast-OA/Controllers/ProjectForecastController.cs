@@ -142,9 +142,13 @@ namespace ProjectForecast_OA.Controllers
                                 join employee in workday_Details on project.ProjectNo equals employee.ProjectNo.ToString()
                                select new Consultant_Workday_Details
                                 {
-                                    Consultant_Id = employee.Consultant_Id,
+                                   Id = employee.Id,
+                                   Consultant_Id = employee.Consultant_Id,
+                                    Consultant_Name=employee.Consultant_Name,
+                                    CostRate=employee.CostRate,
+                                    Type=employee.Type,
                                     Month = employee.Month,
-                                   ProjectNo = Convert.ToInt32(project.ProjectNo),
+                                    ProjectNo = project.ProjectNo,
                                     WorkDays = employee.WorkDays,
                                     Year = employee.Year
                                 };
@@ -193,49 +197,73 @@ namespace ProjectForecast_OA.Controllers
 
         public ActionResult EditProject(ProjectViewModel projectViewModel)
         {
-            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            try
             {
-                var project = context.projects.Select(x=>x).Where(x => x.ProjectNo == projectViewModel.ProjectNo).FirstOrDefault();
-
-                project.CountryId = projectViewModel.Country.CountryId;
-                project.Consultant_ID = projectViewModel.Consultant.Consultant_Id;
-                project.Customer_Id = projectViewModel.Customer.CustomerId;
-                project.ProjectName = projectViewModel.ProjectName;
-                project.ProjectNo = projectViewModel.ProjectNo;
-                project.Status = projectViewModel.Status;
-                project.Type = projectViewModel.Type;
-                project.CloseDate = projectViewModel.CloseDate;
-                project.StartDate = projectViewModel.StartDate;
-
-
-                List<Consultant_Workday_Details> employeeOnProject = new List<Consultant_Workday_Details>();
-                employeeOnProject = projectViewModel.Employees;
-
-                List<Project_Financial_Report> projectFinance = new List<Project_Financial_Report>();
-
-                projectFinance = projectViewModel.ProjectFinancList;
-
-                context.projects.Add(project);
-
-              
-                foreach (var item in employeeOnProject)
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
                 {
-                    context.Consultant_Workday_Details.Add(item);
-                    DbEntityEntry<Consultant_Workday_Details> Consultant_Workday_Details_Entity = context.Entry(item);
-                    Consultant_Workday_Details_Entity.State = EntityState.Modified;
-                }
-                foreach (var item in projectFinance)
-                {
-                    context.ProjectCosts.Add(item);
-                    DbEntityEntry<Project_Financial_Report> Project_Financial_Report_Entity = context.Entry(item);
-                    Project_Financial_Report_Entity.State = EntityState.Modified;
-                }
+                    var project = context.projects.Select(x => x).Where(x => x.ProjectNo == projectViewModel.ProjectNo).FirstOrDefault();
+                    var workday_Details = context.Consultant_Workday_Details.Select(x => x).Where(x => x.ProjectNo == project.ProjectNo).ToList();
+                    var projectCosts = context.ProjectCosts.Select(x => x).Where(x => x.ProjectNo == projectViewModel.ProjectNo).ToList();
 
-                DbEntityEntry<Project> entry = context.Entry(project);
-                entry.State = EntityState.Modified;
-               
+                    project.CountryId = projectViewModel.Country.CountryId;
+                    project.Consultant_ID = projectViewModel.Consultant.Consultant_Id;
+                    project.Customer_Id = projectViewModel.Customer.CustomerId;
+                    project.ProjectName = projectViewModel.ProjectName;
+                    project.ProjectNo = projectViewModel.ProjectNo;
+                    project.Status = projectViewModel.Status;
+                    project.Type = projectViewModel.Type;
+                    project.CloseDate = projectViewModel.CloseDate;
+                    project.StartDate = projectViewModel.StartDate;
 
-                context.SaveChanges();
+                    foreach (var item in projectViewModel.Employees)
+                    {
+                        var added = false;
+                        for (int i=0; i < workday_Details.Count; i++)
+                        {
+                            if (item.Id == workday_Details[i].Id)
+                            {
+                                added = true;
+                                workday_Details[i].WorkDays= item.WorkDays;                                
+                                context.Entry(workday_Details[i]).State = EntityState.Modified;
+                            }
+                        }                       
+                        if (!added)
+                        {
+                            context.Consultant_Workday_Details.Add(item);
+                        }                     
+                    }
+
+                    foreach (var item in projectViewModel.ProjectFinancList)
+                    {
+                        var added = false;
+                        for(int i=0;i< projectCosts.Count; i++)
+                        {
+                            if (item.Id == projectCosts[i].Id)
+                            {
+                                added = true;
+                                projectCosts[i].Expenses = item.Expenses;
+                                projectCosts[i].IT = item.IT;
+                                projectCosts[i].Materials = item.Materials;
+                                projectCosts[i].Revenue = item.Revenue;
+                                context.Entry(projectCosts[i]).State = EntityState.Modified;
+                            }
+                        }
+                        if (!added)
+                        {
+                            context.ProjectCosts.Add(item);
+                        }
+                        
+                    }
+
+                    DbEntityEntry<Project> entry = context.Entry(project);
+                    entry.State = EntityState.Modified;
+                    context.SaveChanges();
+                }
+                
+            }
+           catch(Exception e)
+            {
+
             }
             return null;
         }
