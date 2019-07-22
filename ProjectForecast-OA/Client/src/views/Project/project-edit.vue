@@ -220,13 +220,11 @@
                             employee.forEach(monthElement => {
                                 let exits = false;
                                 for (let j in _vm.months)
-                                // _vm.months.forEach(element => {
                                 {
                                     if (_vm.months[j] == _vm.MonthMappingReverse(monthElement.Month)) {
                                         exits = true;
                                     }
                                 }
-                                // });
                                 if (!exits) {
                                     _vm.months.push(_vm.MonthMappingReverse(monthElement.Month));
                                 }
@@ -239,6 +237,19 @@
                         });
                         _vm.months.sort();
                         _vm.FinancialReport = _vm.detailData.ProjectFinancList;
+                        _vm.FinancialReport.forEach(financial=>{
+                            let exits=false;
+                            financial.Month=_vm.MonthMapping(parseInt(financial.Month));
+                            for(let j in _vm.FinancialReportMonths){
+                                if(_vm.FinancialReportMonths==financial.Month){
+                                    exits=true;
+                                }
+                            }
+                            if(!exits){
+                                _vm.FinancialReportMonths.push(financial.Month);
+                            }
+                           
+                        })
                         _vm.loading = false;
                     }
 
@@ -266,18 +277,18 @@
             },
             MonthMapping(month) {
                 switch (month) {
-                    case "1": return "Mon";
-                    case "2": return "Feb";
-                    case "3": return "Mar";
-                    case "4": return "Apr";
-                    case "5": return "May";
-                    case "6": return "Jun";
+                    case 1: return "Mon";
+                    case 2: return "Feb";
+                    case 3: return "Mar";
+                    case 4: return "Apr";
+                    case 5: return "May";
+                    case 6: return "Jun";
                     case 7: return "Jul";
-                    case "8": return "Aug";
-                    case "9": return "Sep";
-                    case "10": return "Oct";
-                    case "11": return "Nov";
-                    case "12": return "Dec";
+                    case 8: return "Aug";
+                    case 9: return "Sep";
+                    case 10: return "Oct";
+                    case 11: return "Nov";
+                    case 12: return "Dec";
                 }
             },
             MonthMappingReverse(month) {
@@ -382,8 +393,8 @@
                     }
                     else {
                         project.ProjectFinancList.forEach(projectFinance => {
-                            if (element.Id == projectFinance.Id) {
-                                projectFinance = element;
+                            if (_vm.FinancialReport[i].Id == projectFinance.Id) {
+                                projectFinance = _vm.FinancialReport[i];
                             }
                         })
                     }
@@ -395,16 +406,7 @@
                 let startMonth = parseInt(moment(this.FinancialReportTimeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                 let endMonth = parseInt(moment(this.FinancialReportTimeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                 for (let i = startMonth; i <= endMonth; i++) {
-                    let exits = false;
-                    for (let j in _vm.FinancialReportMonths) {
-                        if (_vm.FinancialReportMonths[j] == i) {
-                            exits = true;
-                        }
-                    }
-                    if (!exits) {
-                        this.FinancialReportMonths.push(i);
-                    }
-                    // this.FinancialReport.push({ Month: i + '' });
+                    this.FinancialReport.push({ Month: _vm.MonthMapping(i)});
                 }
             },
             changeUtilizationTimeSpan() {
