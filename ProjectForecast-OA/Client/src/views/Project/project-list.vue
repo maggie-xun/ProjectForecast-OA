@@ -22,10 +22,10 @@
         </el-table-column>
         <el-table-column prop="Comment" label="Comment" >
         </el-table-column>
-        <el-table-column fixed="right" label="操作">
+        <el-table-column fixed="right" label="Operation">
           <template slot-scope="scope">
-            <el-button @click="getProjectDetails(scope.row)" type="text" size="small">查看</el-button>
-            <el-button @click='editProjectDetails(scope.row)' type="text" size="small">编辑</el-button>
+            <el-button @click="getProjectDetails(scope.row)" type="text" size="small">Detail</el-button>
+            <el-button @click='editProjectDetails(scope.row)' type="text" size="small">Edit</el-button>
           </template>
         </el-table-column>
       </el-table>

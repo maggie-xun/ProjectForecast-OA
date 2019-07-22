@@ -17,7 +17,7 @@
                         <el-form-item label="Project Name">
                             <el-input v-model="form.ProjectName"></el-input>
                         </el-form-item>
-                        <el-form-item label="Project Manager">
+                        <el-form-item label="Project Manager" label-width="121px">
                             <el-select v-model="form.Consultant.Consultant_ID" placeholder="">
                                 <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_ID"
                                     v-for='consultant in consultants'></el-option>
@@ -57,7 +57,7 @@
                             </div>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary">Save Now</el-button>
+                            <el-button type="primary" @click='EditProject'>Save Now</el-button>
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
@@ -83,6 +83,11 @@
                                 </el-input>
                             </template>
                         </el-table-column>
+                        <el-table-column prop="Month" label="Month" style="width:6vw;">
+                            <template scope="scope">
+                                <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
+                            </template>
+                        </el-table-column>
                         <el-table-column prop="Type" label="Type">
                             <template scope="scope">
                                 <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
@@ -93,19 +98,20 @@
                                 <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
                             </template>
                         </el-table-column>
-                        <el-table-column prop="MonthElement" :label="MonthMapping(month)" v-for='(month,index) in months'>
+                        <el-table-column prop="CostRate" label="WorkDays">
                             <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.MonthElement[index].WorkingHour"></el-input>
+                                <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
                             </template>
                         </el-table-column>
                         <el-table-column fixed="right" label="Operation">
                             <template slot-scope="scope">
-                                <el-button @click.native.prevent="deleteRow(scope.$index, infiledList)" size="small"> Remove
+                                <el-button @click.native.prevent="deleteRow(scope.$index, infiledList,scope.row.Id)"
+                                    size="small"> Remove
                                 </el-button>
                             </template>
                         </el-table-column>
                     </el-table>
-                    <el-button type="primary">Save</el-button>
+                    <el-button type="primary" @click='EditProject'>Save Now</el-button>
                 </el-tab-pane>
                 <el-tab-pane label="FinancialReport" name="third">
                     <div class="block">
@@ -143,7 +149,8 @@
 
                             <el-table-column fixed="right" label="Operation">
                                 <template slot-scope="scope">
-                                    <el-button @click.native.prevent="deleteRow(scope.$index, infiledList)"
+                                    <el-button
+                                        @click.native.prevent="deleteFinanceRow(scope.$index, FinancialReport,scope.row.Id)"
                                         size="small"> Remove
                                     </el-button>
                                 </template>
@@ -175,9 +182,6 @@
                 timeSpan: '',
                 FinancialReportTimeSpan: [],
                 infiledList: [],
-                months: [],
-
-                FinancialReportMonths: [],
                 FinancialReport: [],
                 Countries: [],
                 conntry_added: "",
@@ -209,47 +213,10 @@
                         if (!_vm.form.Country) {
                             _vm.form.Country = { CountryId: '' }
                         }
-                        // _vm.infiledList = _vm.detailData.Employees;
-                        let result = _vm.groupBy(_vm.detailData.Employees, function (item) {
-                            return [item.Consultant_Id];
-                        })
-                        console.log(result);
-                        result.forEach(employee => {
-                            let consultant_show = { Id: employee[0].Id, Consultant_Id: employee[0].Consultant_Id, Consultant_Name: employee[0].Consultant_Name, Type: employee[0].Type, CostRate: employee[0].CostRate, ProjectNo: this.form.ProjectNo, Month: employee[0].Month, };
-                            let MonthElement = [];
-                            employee.forEach(monthElement => {
-                                let exits = false;
-                                for (let j in _vm.months)
-                                {
-                                    if (_vm.months[j] == _vm.MonthMappingReverse(monthElement.Month)) {
-                                        exits = true;
-                                    }
-                                }
-                                if (!exits) {
-                                    _vm.months.push(_vm.MonthMappingReverse(monthElement.Month));
-                                }
-
-                                MonthElement.push({ Month: monthElement.Month, WorkingHour: monthElement.WorkDays })
-
-                            });
-                            consultant_show.MonthElement = MonthElement;
-                            _vm.infiledList.push(consultant_show);
-                        });
+                        _vm.infiledList = _vm.detailData.Employees;
+                       
                         _vm.months.sort();
                         _vm.FinancialReport = _vm.detailData.ProjectFinancList;
-                        _vm.FinancialReport.forEach(financial=>{
-                            let exits=false;
-                            financial.Month=_vm.MonthMapping(parseInt(financial.Month));
-                            for(let j in _vm.FinancialReportMonths){
-                                if(_vm.FinancialReportMonths==financial.Month){
-                                    exits=true;
-                                }
-                            }
-                            if(!exits){
-                                _vm.FinancialReportMonths.push(financial.Month);
-                            }
-                           
-                        })
                         _vm.loading = false;
                     }
 
@@ -310,8 +277,13 @@
             NextPage() {
                 this.activeName = 'second';
             },
-            deleteRow(index, rows) {//删除改行
+            deleteRow(index, rows, rowId) {//删除改行
                 rows.splice(index, 1);
+                formData_service.default.deleteEmployee.exec(rowId)
+            },
+            deleteFinanceRow(index, rows, rowId) {
+                rows.splice(index, 1);
+                formData_service.default.deleteFinance.exec(rowId)
             },
             onSubmit() {
                 console.log(formData_service);
@@ -337,76 +309,50 @@
                 project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
                 project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
                 project.Country = _vm.form.Country;
-                if (project.ProjectFinancList.length <= 0) {
-                    project.ProjectFinancList = [];
+                if (project.Employees.length > 0) {
+                    for (let j in project.Employees) {
+                        if (!project.Employees[j].Id) {
+                            project.Employees[j].ProjectNo = _vm.form.ProjectNo;
+                        }
+                    }
                 }
-                if (project.Employees.length <= 0) {
+                else {
                     project.Employees = [];
                 }
-                for (let i in _vm.infiledList) {
-                    if (_vm.months.length > 0) {
-                        _vm.months.forEach(month => {
-                            _vm.infiledList[i].MonthElement.forEach(monthElement => {
-                                let exist = false;
-                                //修改
-                                for (let j in project.Employees) {
-                                    if (_vm.infiledList[i].Id == project.Employees[j].Id) {
-                                        exist = true;
-                                        _vm.infiledList[i].WorkDays = monthElement.WorkingHour;
-                                    }
-                                }
-                                //新添加的
-                                if (!exist) {
-                                    _vm.infiledList.push({ Id: _vm.infiledList[i].Id, Consultant_Id: _vm.infiledList[i].Consultant_Id, Consultant_Name: _vm.infiledList[i].Consultant_Name, Type: _vm.infiledList[i].Type, CostRate: _vm.infiledList[i].CostRate, ProjectNo: _vm.form.ProjectNo, Month: _vm.MonthMapping(month), WorkDays: monthElement.WorkingHour })
-                                    _vm.infiledList.splice(i, 1);
-                                }
-                            })
-                        })
 
-                    }
-                }
-                project.Employees = _vm.infiledList;
+                _vm.infiledList = project.Employees;
                 for (let i in _vm.FinancialReport) {
-                    if (this.FinancialReportMonths.length > 0) {
-                        let exist = false;
-                        this.FinancialReportMonths.forEach(month => {
-                            for (let j in project.ProjectFinancList) {
-                                if (_vm.FinancialReport[i].Id) {
-                                    if (project.ProjectFinancList[j].Id == _vm.FinancialReport[i].Id) {
-                                        exist = true;
-                                        project.ProjectFinancList[j] = _vm.FinancialReport[i];
-                                    }
-                                }
-                            };
-                            if (!exist) {
-                                //跨年问题需处理
-                                let financeMonth = month;
-                                let financeYear = parseInt(moment(this.FinancialReportTimeSpan[1]).format('MM-DD-YYYY').split('-')[2])//parseInt(moment(month).format('MM-DD-YYYY').split('-')[2]);
-                                project.ProjectFinancList.push({
-                                    ProjectNo: this.form.ProjectNo, Revenue: _vm.FinancialReport[i].Revenue, Expenses: _vm.FinancialReport[i].Expenses,
-                                    IT: _vm.FinancialReport[i].IT, Materials: _vm.FinancialReport[i].Materials, Month: financeMonth, Year: financeYear
-                                });
-                                project.ProjectFinancList.splice(i, 1);
-
+                    let exist = false;
+                        if (project.ProjectFinancList.length > 0) {
+                        for (let j in project.ProjectFinancList) {
+                            //已存在，编辑
+                            if (!project.ProjectFinancList[j].Id) {
+                                project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
                             }
-                        })
+                        }
                     }
                     else {
-                        project.ProjectFinancList.forEach(projectFinance => {
-                            if (_vm.FinancialReport[i].Id == projectFinance.Id) {
-                                projectFinance = _vm.FinancialReport[i];
-                            }
-                        })
+                        project.ProjectFinancList = [];
                     }
                 };
+                _vm.FinancialReport = project.ProjectFinancList;
+
                 formData_service.default.editProject.extc(project)
+                    .then(() => {
+                        this.$router.push({
+                            name: 'project_edit',
+                            params: {
+                                item: project.ProjectNo
+                            }
+                        })
+                    })
             },
             changeFinancialReportTimeSpan() {
                 var _vm = this;
                 let startMonth = parseInt(moment(this.FinancialReportTimeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                 let endMonth = parseInt(moment(this.FinancialReportTimeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                 for (let i = startMonth; i <= endMonth; i++) {
-                    this.FinancialReport.push({ Month: _vm.MonthMapping(i)});
+                    this.FinancialReport.push({ Month: _vm.MonthMapping(i) });
                 }
             },
             changeUtilizationTimeSpan() {
@@ -414,32 +360,17 @@
                 let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                 let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                 for (let i = startMonth; i <= endMonth; i++) {
-                    let exits = false;
-                    for (let j in _vm.months) {
-                        if (_vm.months[j] == i) {
-                            exits = true;
-                        }
-                    }
-                    if (!exits) {
-                        this.months.push(i);
-                    }
+                    this.checkList.forEach(element => {
+                        this.consultants.forEach(employee => {
+                            if (employee.Consultant_Name == element) {
+                                this.infiledList.push({
+                                    Consultant_Id: employee.Consultant_Id, Consultant_Name: employee.Consultant_Name, Type: employee.Type, CostRate: employee.CostRate, Month: _vm.MonthMapping(i)
+                                })
+                            }
+                        })
 
+                    });
                 }
-
-                this.checkList.forEach(element => {
-                    this.consultants.forEach(employee => {
-                        if (employee.Consultant_Name == element) {
-                            let MonthElement = []
-                            this.months.forEach(month => {
-                                MonthElement.push({ Month: month, WorkingHour: '' })
-                            })
-                            this.infiledList.push({
-                                Consultant_Id: employee.Consultant_Id, Consultant_Name: employee.Consultant_Name, Type: employee.Type, CostRate: employee.CostRate, MonthElement: MonthElement
-                            })
-                        }
-                    })
-
-                });
             }
         }
     }

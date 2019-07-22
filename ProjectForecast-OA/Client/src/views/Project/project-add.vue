@@ -5,7 +5,7 @@
                 <el-tab-pane label="Basic Info" name="first" style='line-height: 20px;'>
                     <el-form ref="form" :model="form" label-width="120px">
                         <el-form-item label="Country">
-                            <el-select v-model="form.Country" placeholder="Please Select a Country">
+                            <el-select v-model="form.Country.CountryId" placeholder="Please Select a Country">
                                 <el-option :label="country.CountryName" :value="country.CountryId" v-for='country in Country'></el-option>
                             </el-select>
                             <el-button type="text" @click="open">Add Country</el-button>
@@ -16,13 +16,14 @@
                         <el-form-item label="Project Name">
                             <el-input v-model="form.ProjectName"></el-input>
                         </el-form-item>
-                            <el-form-item label="Project Manager">
-                                    <el-select v-model="form.Consultant.Consultant_Name" placeholder="">
-                                        <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_ID" v-for='consultant in consultants'></el-option>
-                                    </el-select>
-                                </el-form-item>
+                        <el-form-item label="Project Manager" label-width="121px">
+                                <el-select v-model="form.Consultant.Consultant_ID" placeholder="">
+                                    <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_ID"
+                                        v-for='consultant in consultants'></el-option>
+                                </el-select>
+                            </el-form-item>
                         <el-form-item label="Customer">
-                                <el-select v-model="form.Customer" placeholder="">
+                                <el-select v-model="form.Customer.CustomerId" placeholder="">
                                     <el-option :label="customer.Customer_name" :value="customer.CustomerId" v-for='customer in customers'></el-option>
                                 </el-select>
                             </el-form-item>
@@ -41,6 +42,12 @@
                                 <el-option label="Cancelled" value="Cancelled"></el-option>
                             </el-select>
                         </el-form-item>
+                        <el-form-item label="StartDate">
+                                <div class="block">
+                                    <el-date-picker v-model="form.StartDate" type="date" placeholder="">
+                                    </el-date-picker>
+                                </div>
+                            </el-form-item>
                         <el-form-item label="CloseDate">
                             <div class="block">
                                 <el-date-picker v-model="form.CloseDate" type="date" placeholder="">
@@ -49,7 +56,6 @@
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary">Add Now</el-button>
-                            <el-button type="primary" @click='NextPage'>Next Tab</el-button>
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
@@ -67,38 +73,43 @@
                         <el-date-picker v-model="timeSpan" type="daterange" range-separator="To"
                             start-placeholder="Start" end-placeholder="End" @change='changeUtilizationTimeSpan'>
                         </el-date-picker>
-                        <el-button type="primary" @click="AddEmployee">AddEmployee</el-button>
                     </div>
                     <el-table border :data="infiledList" style="width: 100%">
-                        <el-table-column prop="fildna" label="Name" style="width:6vw;">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.Name" disabled="disabled"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="Type" label="Type">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="CostRate" label="CostRate">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="MonthElement" :label="month" v-for='(month,index) in months'>
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.MonthElement[index].WorkingHour"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column fixed="right" label="操作">
-                            <template slot-scope="scope">
-                                <el-button @click.native.prevent="deleteRow(scope.$index, infiledList)" size="small"> 移除
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+                            <el-table-column prop="fildna" label="Name" style="width:6vw;">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.Consultant_Name" disabled="disabled">
+                                    </el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="Month" label="Month" style="width:6vw;">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="Type" label="Type">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="CostRate" label="CostRate">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="CostRate" label="WorkDays">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column fixed="right" label="Operation">
+                                <template slot-scope="scope">
+                                    <el-button @click.native.prevent="deleteRow(scope.$index, infiledList,scope.row.Id)"
+                                        size="small"> Remove
+                                    </el-button>
+                                </template>
+                            </el-table-column>
+                        </el-table>
                     <el-button type="primary">Save</el-button>
-                    <el-button type="primary">Next Tab</el-button>
                 </el-tab-pane>
                 <el-tab-pane label="FinancialReport" name="third">
                     <div class="block">
@@ -158,11 +169,10 @@
     export default {
         data() {
             return {
-                form: {  },
+                form: { Consultant:{Consultant_ID:''} ,Country:{CountryId:''},Customer:{CustomerId:''}},
                 CloseDate: '',
                 activeName: 'first',
                 checkList: [],
-                consultants: [],
                 customers:[],
                 consultants:[],
                 timeSpan: '',
@@ -173,6 +183,8 @@
                 FinancialReport: [],
                 Country: [],
                 conntry_added: "",
+                Consultant:{},
+                Customer:{},
                 isAdded: false
             }
         },
@@ -194,16 +206,23 @@
            
         },
         watch: {
-            Country:function(){
-                formData_service.default.getAllCountry.extc()
-                .then(data => {
-                    this.Country = data.data;
-                });
-            }
         },
         methods: {
-            NextPage(){
-                this.activeName='second';
+            MonthMapping(month) {
+                switch (month) {
+                    case 1: return "Mon";
+                    case 2: return "Feb";
+                    case 3: return "Mar";
+                    case 4: return "Apr";
+                    case 5: return "May";
+                    case 6: return "Jun";
+                    case 7: return "Jul";
+                    case 8: return "Aug";
+                    case 9: return "Sep";
+                    case 10: return "Oct";
+                    case 11: return "Nov";
+                    case 12: return "Dec";
+                }
             },
             onSubmit() {
                 console.log(formData_service);
@@ -234,36 +253,30 @@
             },
             
             AddProject() {
+                var _vm = this;
                 let project = this.form;
                 project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
-                project.Employees = [];
-                project.ProjectFinancList = [];
-                project.Country = {CountryId:this.form.Country};
-                this.infiledList.forEach(element => {
-                    this.months.forEach(month => {
-                        let workingHour;
-                        element.MonthElement.forEach(monthElement => {
-                            if (monthElement.Month == month) {
-                                workingHour = monthElement.WorkingHour;
+                project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
+                project.Country = _vm.form.Country;
+                project.Consultant = _vm.form.Consultant;
+                project.Customer = _vm.form.Customer;
+                project.Employees=_vm.infiledList  ;
+               
+                
+                for (let j in project.Employees) {
+                        if (!project.Employees[j].Id) {
+                            project.Employees[j].ProjectNo = _vm.form.ProjectNo;
+                        }
+                    }
+                    project.ProjectFinancList=_vm.FinancialReport;
+                    for (let j in project.ProjectFinancList) {
+                            //已存在，编辑
+                            if (!project.ProjectFinancList[j].Id) {
+                                project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
                             }
-                        })
+                        }
 
-                        project.Employees.push({ EmployeeId: element.EmployeeId, ProjectNo: this.form.ProjectNo, Month: month, WorkingHour: workingHour })
-                    })
-
-                });
-                this.FinancialReport.forEach(element => {
-                    this.FinancialReportTimeSpan.forEach(month => {
-                        let financeMonth = parseInt(moment(month).format('MM-DD-YYYY').split('-')[0]);
-                        let financeYear=parseInt(moment(month).format('MM-DD-YYYY').split('-')[2]);
-                        project.ProjectFinancList.push({
-                            ProjectNo: this.form.ProjectNo, Revenue: element.Revenue, Expenses: element.Expenses,
-                            IT: element.IT, Materials: element.Materials, Month: financeMonth,Year:financeYear
-                        })
-                    })
-
-                });
-                formData_service.default.addProject.extc(this.form)
+                formData_service.default.addProject.extc(project)
 
                 // project.Employees=infiledList;
                 // project.ProjectFinancList=this.FinancialReport;
@@ -278,28 +291,22 @@
                 }
             },
             changeUtilizationTimeSpan() {
+                    var _vm = this;
                     let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
 
                     let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                     for (let i = startMonth; i <= endMonth; i++) {
-                        this.months.push(this.MonthMapping(i + ''));
-                    }
-
-                    this.checkList.forEach(element => {
+                        this.checkList.forEach(element => {
                         this.consultants.forEach(employee => {
                             if (employee.Consultant_Name == element) {
-                                let MonthElement = []
-                                this.months.forEach(month => {
-                                    MonthElement.push({ Month: month, WorkingHour: '' })
-                                })
                                 this.infiledList.push({
-                                    EmployeeId: employee.EmployeeId,
-                                    Consultant_Name: employee.Consultant_Name, Type: employee.Type, CostRate: employee.CostRate, MonthElement: MonthElement
+                                    Consultant_Id: employee.Consultant_Id, Consultant_Name: employee.Consultant_Name, Type: employee.Type, CostRate: employee.CostRate, Month: _vm.MonthMapping(i)
                                 })
                             }
                         })
 
                     });
+                    }                   
                 }
         }
     }

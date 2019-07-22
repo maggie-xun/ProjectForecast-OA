@@ -37,7 +37,7 @@
                     <el-menu-item index="3" disabled>CRM</el-menu-item>
                     <el-menu-item index="4"><a href="https://www.ele.me" target="_blank">Overview</a></el-menu-item>
                     <el-menu-item index="5"><a href="https://www.ele.me" target="_blank">SAP LTF</a></el-menu-item>
-                    <el-menu-item index="6" style="float: right"><a href="/Account/LogOff">Log Off</a></el-menu-item>
+                    <el-menu-item index="6" style="float: right"><a href="/Account/LogOff">Log Out</a></el-menu-item>
                 </el-menu>
             </el-header>
             <!-- <el-container>

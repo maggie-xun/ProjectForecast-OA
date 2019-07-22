@@ -52,6 +52,10 @@
             handleClick(tab, event) {
                 console.log(tab, event);
             },
+            deleteFinanceRow(index, rows, rowId) {
+                rows.splice(index, 1);
+                formData_service.default.deleteFinance.exec(rowId)
+            },
             onSubmit() {
                 console.log(formData_service);
                 formData_service.default.addEmployee.extc(this.form)

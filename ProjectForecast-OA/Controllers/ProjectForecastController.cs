@@ -56,38 +56,45 @@ namespace ProjectForecast_OA.Controllers
     
         public ActionResult AddProject(ProjectViewModel projectViewModel)
         {
-            using (EFCodeFirstDbContext context= new EFCodeFirstDbContext())
+            try
             {
-                Project project = new Project()
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
                 {
-                    CountryId =  projectViewModel.Country.CountryId,
-                    Consultant_ID = projectViewModel.Consultant.Consultant_Id,
-                    ProjectName = projectViewModel.ProjectName,
-                    ProjectNo =  projectViewModel.ProjectNo,
-                    Customer_Id = projectViewModel.Customer.CustomerId,
-                    Status = projectViewModel.Status,
-                    Type = projectViewModel.Type,
-                    CloseDate = projectViewModel.CloseDate,
-                    StartDate = projectViewModel.StartDate
-                };
+                    Project project = new Project()
+                    {
+                        CountryId = projectViewModel.Country.CountryId,
+                        //Consultant_ID = projectViewModel.Consultant.Consultant_Id,
+                        ProjectName = projectViewModel.ProjectName,
+                        ProjectNo = projectViewModel.ProjectNo,
+                        Customer_Id = projectViewModel.Customer.CustomerId,
+                        Status = projectViewModel.Status,
+                        Type = projectViewModel.Type,
+                        CloseDate = projectViewModel.CloseDate,
+                        StartDate = projectViewModel.StartDate
+                    };
 
-                List<Consultant_Workday_Details> employeeOnProject = new List<Consultant_Workday_Details>();
-                employeeOnProject = projectViewModel.Employees;
+                    List<Consultant_Workday_Details> employeeOnProject = new List<Consultant_Workday_Details>();
+                    employeeOnProject = projectViewModel.Employees;
 
-                List<Project_Financial_Report> projectFinance = new List<Project_Financial_Report>();
+                    List<Project_Financial_Report> projectFinance = new List<Project_Financial_Report>();
 
-                projectFinance = projectViewModel.ProjectFinancList;
+                    projectFinance = projectViewModel.ProjectFinancList;
 
-                context.projects.Add(project);
-                foreach (var item in employeeOnProject)
-                {
-                    context.Consultant_Workday_Details.Add(item);
+                    context.projects.Add(project);
+                    foreach (var item in employeeOnProject)
+                    {
+                        context.Consultant_Workday_Details.Add(item);
+                    }
+                    foreach (var item in projectFinance)
+                    {
+                        context.ProjectCosts.Add(item);
+                    }
+                    context.SaveChanges();
                 }
-                foreach (var item in projectFinance)
-                {
-                    context.ProjectCosts.Add(item);
-                }
-                context.SaveChanges();
+            }
+            catch(Exception e)
+            {
+
             }
             return null;
         }
@@ -288,6 +295,27 @@ namespace ProjectForecast_OA.Controllers
                 var customers = context.Customers.Select(x => x).ToList();
                 context.SaveChanges();
                 return Json(customers, JsonRequestBehavior.AllowGet);
+            }
+        }
+        public ActionResult DeleteEmployee(int id)
+        {
+            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            {
+                var consultant = context.Consultant_Workday_Details.Select(x => x).Where(x=>x.Id==id).FirstOrDefault();
+                context.Consultant_Workday_Details.Remove(consultant);
+                context.SaveChanges();
+                return Json(consultant, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult DeleteFinance(int id)
+        {
+            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            {
+                var consultant = context.ProjectCosts.Select(x => x).Where(x => x.Id == id).FirstOrDefault();
+                context.ProjectCosts.Remove(consultant);
+                context.SaveChanges();
+                return Json(consultant, JsonRequestBehavior.AllowGet);
             }
         }
     }

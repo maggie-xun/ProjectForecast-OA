@@ -15,7 +15,7 @@
                                     <el-input v-model="form.ProjectName" :disabled="true"></el-input>
                                 </el-form-item>
                                 <el-form-item label="Project Manager">
-                                        <el-input v-model="form.Consultant.Consultant_ID" :disabled="true"></el-input>
+                                        <el-input v-model="form.Consultant.Consultant_Name" :disabled="true"></el-input>
                                     </el-form-item>
                                 <el-form-item label="Customer">
                                     <el-input v-model="form.Customer.Customer_name" :disabled="true"></el-input>
@@ -31,35 +31,40 @@
                                 </el-form-item>
                                 <el-form-item>
                                     <el-button type="primary">Add Now</el-button>
-                                    <el-button type="primary" @click='NextPage'>Next Tab</el-button>
                                 </el-form-item>
                             </el-form>
                         </el-tab-pane>
                         <el-tab-pane label="Utilization" name="second">
-                            <el-table border :data="infiledList" style="width: 100%">
-                                <el-table-column prop="fildna" label="Name" style="width:6vw;">
-                                    <template scope="scope">
-                                        <el-input size="mini" v-model="scope.row.Name" disabled="disabled"></el-input>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="Type" label="Type">
-                                    <template scope="scope">
-                                        <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
-                                    </template>
-                                </el-table-column>
-                                <el-table-column prop="CostRate" label="CostRate">
-                                    <template scope="scope">
-                                        <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
-                                    </template>
-                                </el-table-column>
-                                <!-- <el-table-column prop="MonthElement" :label="month" v-for='(month,index) in months'>
-                                    <template scope="scope">
-                                        <el-input size="mini" v-model="scope.row.MonthElement[index].WorkingHour"></el-input>
-                                    </template>
-                                </el-table-column> -->
-                            </el-table>
+                                <el-table border :data="infiledList" style="width: 100%">
+                                        <el-table-column prop="fildna" label="Name" style="width:6vw;">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.Consultant_Name" disabled="disabled">
+                                                </el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="Month" label="Month" style="width:6vw;">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="Type" label="Type">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="CostRate" label="CostRate">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="CostRate" label="WorkDays" disabled="disabled">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                    </el-table>
                             <el-button type="primary">Save</el-button>
-                            <el-button type="primary">Next Tab</el-button>
+
                         </el-tab-pane>
                         <el-tab-pane label="FinancialReport" name="third">
                             <div class="block">        
