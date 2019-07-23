@@ -63,7 +63,7 @@ namespace ProjectForecast_OA.Controllers
                     Project project = new Project()
                     {
                         CountryId = projectViewModel.Country.CountryId,
-                        //Consultant_ID = projectViewModel.Consultant.Consultant_Id,
+                        Consultant_ID = projectViewModel.Consultant.Consultant_Id,
                         ProjectName = projectViewModel.ProjectName,
                         ProjectNo = projectViewModel.ProjectNo,
                         Customer_Id = projectViewModel.Customer.CustomerId,
@@ -81,14 +81,21 @@ namespace ProjectForecast_OA.Controllers
                     projectFinance = projectViewModel.ProjectFinancList;
 
                     context.projects.Add(project);
-                    foreach (var item in employeeOnProject)
+                    if (employeeOnProject != null)
                     {
-                        context.Consultant_Workday_Details.Add(item);
+                        foreach (var item in employeeOnProject)
+                        {
+                            context.Consultant_Workday_Details.Add(item);
+                        }
                     }
-                    foreach (var item in projectFinance)
+                    if (projectFinance != null)
                     {
-                        context.ProjectCosts.Add(item);
+                        foreach (var item in projectFinance)
+                        {
+                            context.ProjectCosts.Add(item);
+                        }
                     }
+                   
                     context.SaveChanges();
                 }
             }

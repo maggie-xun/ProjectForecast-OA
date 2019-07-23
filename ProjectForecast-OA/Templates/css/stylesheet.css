@@ -150,7 +150,7 @@ a:hover,a:focus,a:active{color: #FFF; text-decoration: none;}
 /* eof page navigation control panel*/
 
 /* blocks */
-.block{margin-bottom: 20px; float: left; width: 100%; position: relative;}
+.block{margin-bottom: 20px; position: relative;}
     .block .header, .block .content, .block .footer, .block .toolbar, 
     .block .header.header-default, .block .content.content-default, .block .toolbar.toolbar-default, .block .footer.footer-defaut
     {background: rgba(0,0,0,0.3); float: left; width: 100%;}    

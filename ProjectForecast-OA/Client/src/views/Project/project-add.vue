@@ -17,8 +17,8 @@
                             <el-input v-model="form.ProjectName"></el-input>
                         </el-form-item>
                         <el-form-item label="Project Manager" label-width="121px">
-                                <el-select v-model="form.Consultant.Consultant_ID" placeholder="">
-                                    <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_ID"
+                                <el-select v-model="form.Consultant.Consultant_Id" placeholder="">
+                                    <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_Id"
                                         v-for='consultant in consultants'></el-option>
                                 </el-select>
                             </el-form-item>
@@ -60,7 +60,7 @@
                     </el-form>
                 </el-tab-pane>
                 <el-tab-pane label="Utilization" name="second">
-                    <span class="demonstration">Select Consultants: </span>
+                    <span class="demonstration" style='font-weight:bold'>Select Consultants: </span>
                     <el-checkbox-group v-model="checkList" style="display:inline-block">
                         <el-checkbox :label="employee.Consultant_Name" v-for='employee in consultants'></el-checkbox>
                     </el-checkbox-group>
@@ -68,8 +68,8 @@
                         Please Add Employee First
                     </span>
 
-                    <div class="block">
-                        <span class="demonstration" style="display:inline-block">Select Time Span: </span>
+                    <div style='display:inline;margin-left:100px'>
+                        <span class="demonstration" style="display:inline-block;font-weight:bold">Select Time Span: </span>
                         <el-date-picker v-model="timeSpan" type="daterange" range-separator="To"
                             start-placeholder="Start" end-placeholder="End" @change='changeUtilizationTimeSpan'>
                         </el-date-picker>
@@ -113,7 +113,7 @@
                 </el-tab-pane>
                 <el-tab-pane label="FinancialReport" name="third">
                     <div class="block">
-                        <span class="demonstration">Please Select Time Span</span>
+                        <span class="demonstration" style='font-weight:bold'>Please Select Time Span</span>
                         <el-date-picker v-model="FinancialReportTimeSpan" type="daterange" range-separator="To" start-placeholder="Start" @change='changeFinancialReportTimeSpan'
                             end-placeholder="Ends">
                         </el-date-picker>
@@ -169,7 +169,7 @@
     export default {
         data() {
             return {
-                form: { Consultant:{Consultant_ID:''} ,Country:{CountryId:''},Customer:{CustomerId:''}},
+                form: { Consultant:{Consultant_Id:''} ,Country:{CountryId:''},Customer:{CustomerId:''}},
                 CloseDate: '',
                 activeName: 'first',
                 checkList: [],
@@ -264,17 +264,17 @@
                
                 
                 for (let j in project.Employees) {
-                        if (!project.Employees[j].Id) {
-                            project.Employees[j].ProjectNo = _vm.form.ProjectNo;
-                        }
+                    if (!project.Employees[j].Id) {
+                        project.Employees[j].ProjectNo = _vm.form.ProjectNo;
                     }
-                    project.ProjectFinancList=_vm.FinancialReport;
-                    for (let j in project.ProjectFinancList) {
-                            //已存在，编辑
-                            if (!project.ProjectFinancList[j].Id) {
-                                project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
-                            }
-                        }
+                }
+                project.ProjectFinancList = _vm.FinancialReport;
+                for (let j in project.ProjectFinancList) {
+                    //已存在，编辑
+                    if (!project.ProjectFinancList[j].Id) {
+                        project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
+                    }
+                }
 
                 formData_service.default.addProject.extc(project)
 
@@ -283,31 +283,69 @@
 
             },
             changeFinancialReportTimeSpan() {
+                var _vm = this;
+                let warning=false;
                 let startMonth = parseInt(moment(this.FinancialReportTimeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
 
                 let endMonth = parseInt(moment(this.FinancialReportTimeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                 for (let i = startMonth; i < endMonth + 1; i++) {
-                    this.FinancialReport.push({ Month: i + '' });
+                    let exits=false;
+                   _vm.FinancialReport.forEach(item=>{
+                       if(item.Month== _vm.MonthMapping(i)){
+                        warning=true;
+                        exits=true;
+                       }
+                   })
+                   if(!exits){
+                    this.FinancialReport.push({ Month: _vm.MonthMapping(i) });
+                   }
+                   if(warning){
+                    this.$message({
+                        message: 'The Month is already exits, please try another one',
+                        type: 'warning'
+                    });
+                }
                 }
             },
             changeUtilizationTimeSpan() {
-                    var _vm = this;
-                    let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
+                var _vm = this;
+                let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
 
-                    let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-                    for (let i = startMonth; i <= endMonth; i++) {
-                        this.checkList.forEach(element => {
-                        this.consultants.forEach(employee => {
-                            if (employee.Consultant_Name == element) {
-                                this.infiledList.push({
-                                    Consultant_Id: employee.Consultant_Id, Consultant_Name: employee.Consultant_Name, Type: employee.Type, CostRate: employee.CostRate, Month: _vm.MonthMapping(i)
-                                })
+                let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
+                for (let i = startMonth; i <= endMonth; i++) {
+                    this.checkList.forEach(element => {
+                        let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
+                        let exists = false;
+                        _vm.infiledList.forEach(utilization => {
+                            if (utilization.Consultant_Name == element && utilization.Month == _vm.MonthMapping(i)) {
+                                exists = true;
+                                warning = true;
                             }
                         })
-
+                        if (!exists) {
+                            this.infiledList.push({
+                                Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type, CostRate: consultant.CostRate, Month: _vm.MonthMapping(i)
+                            })
+                        }
                     });
-                    }                   
                 }
+
+                if (warning) {
+                    console.log('已存在');
+                    this.$message({
+                        message: 'The item is already exits, please try another one',
+                        type: 'warning'
+                    });
+                }
+            },
+                getProperty(list,property,value){
+                for(let i in list){
+                    if(list[i][property]==value){
+                        return list[i];
+                    }
+                }
+                
+            }
         }
     }
 </script>
