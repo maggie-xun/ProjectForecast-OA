@@ -42,20 +42,13 @@
                                 <el-option label="Cancelled" value="Cancelled"></el-option>
                             </el-select>
                         </el-form-item>
-                        <el-form-item label="StartDate">
-                                <div class="block">
-                                    <el-date-picker v-model="form.StartDate" type="date" placeholder="">
-                                    </el-date-picker>
-                                </div>
-                            </el-form-item>
-                        <el-form-item label="CloseDate">
-                            <div class="block">
-                                <el-date-picker v-model="form.CloseDate" type="date" placeholder="">
-                                </el-date-picker>
-                            </div>
+                        <el-form-item label="Select Time Span:">
+                            <el-date-picker v-model="timeSpan" type="daterange" range-separator="To" start-placeholder="Start"
+                                end-placeholder="End" @change='changeTimeSpan'>
+                            </el-date-picker>
                         </el-form-item>
                         <el-form-item>
-                            <el-button type="primary">Add Now</el-button>
+                            <el-button type="primary" @click='firstToSecond'>Next</el-button>
                         </el-form-item>
                     </el-form>
                 </el-tab-pane>
@@ -67,13 +60,8 @@
                     <span v-if='consultants.length<=0'>
                         Please Add Employee First
                     </span>
+                    <el-button type="primary" @click='addEmployee'>Add Emlpoyee</el-button>
 
-                    <div style='display:inline;margin-left:100px'>
-                        <span class="demonstration" style="display:inline-block;font-weight:bold">Select Time Span: </span>
-                        <el-date-picker v-model="timeSpan" type="daterange" range-separator="To"
-                            start-placeholder="Start" end-placeholder="End" @change='changeUtilizationTimeSpan'>
-                        </el-date-picker>
-                    </div>
                     <el-table border :data="infiledList" style="width: 100%">
                             <el-table-column prop="fildna" label="Name" style="width:6vw;">
                                 <template scope="scope">
@@ -96,7 +84,7 @@
                                     <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="CostRate" label="WorkDays">
+                            <el-table-column prop="WorkDays" label="WorkDays">
                                 <template scope="scope">
                                     <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
                                 </template>
@@ -109,19 +97,35 @@
                                 </template>
                             </el-table-column>
                         </el-table>
-                    <el-button type="primary">Save</el-button>
+                    <el-button type="primary" @click='secondToThird'>Next</el-button>
                 </el-tab-pane>
                 <el-tab-pane label="FinancialReport" name="third">
                     <div class="block">
-                        <span class="demonstration" style='font-weight:bold'>Please Select Time Span</span>
-                        <el-date-picker v-model="FinancialReportTimeSpan" type="daterange" range-separator="To" start-placeholder="Start" @change='changeFinancialReportTimeSpan'
-                            end-placeholder="Ends">
-                        </el-date-picker>
 
-                        <el-table border :data="FinancialReport" style="width: 100%">
+                        <el-table border :data="sumList" style="width: 100%">
                             <el-table-column prop="Month" label="Month" style="width:6vw;">
                                 <template scope="scope">
                                     <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="HeadCountCost" label="HeadCountCost" style="width:6vw;">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.HeadCountCost"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="ChargesIn" label="ChargesIn" style="width:6vw;">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.ChargesIn"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="Contractors" label="Contractors" style="width:6vw;">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.Contractors"></el-input>
+                                </template>
+                            </el-table-column>
+                            <el-table-column prop="GP" label="GP" style="width:6vw;">
+                                <template scope="scope">
+                                    <el-input size="mini" v-model="scope.row.GP"></el-input>
                                 </template>
                             </el-table-column>
                             <el-table-column prop="Revenue" label="Revenue" style="width:6vw;">
@@ -175,17 +179,15 @@
                 checkList: [],
                 customers:[],
                 consultants:[],
-                timeSpan: '',
-                FinancialReportTimeSpan: [],
-                infiledList: [],
-                months: [],
-                FinancialReportMonths: [],
-                FinancialReport: [],
                 Country: [],
-                conntry_added: "",
-                Consultant:{},
-                Customer:{},
-                isAdded: false
+                timeSpan: '',
+                infiledList: [],
+                FinancialReport: [],
+                isAdded: false,
+                startMonth:'',
+                endMonth:'',
+                sumList:[]
+
             }
         },
         created() {
@@ -224,15 +226,8 @@
                     case 12: return "Dec";
                 }
             },
-            onSubmit() {
-                console.log(formData_service);
-                formData_service.default.upload.extc(this.form)
-            },
             deleteRow(index, rows) {//删除改行
                 rows.splice(index, 1);
-            },
-            addRow(tableData, event) {
-                tableData.push({ fildna: '', fildtp: '', remark: '' })
             },
             open() {
                 this.$prompt('Please input the country name', '', {
@@ -255,20 +250,20 @@
             AddProject() {
                 var _vm = this;
                 let project = this.form;
-                project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
                 project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
-                project.Country = _vm.form.Country;
-                project.Consultant = _vm.form.Consultant;
-                project.Customer = _vm.form.Customer;
+                project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
+
+                _vm.startMonth = parseInt(project.CloseDate.split('-')[0]);
+                _vm.endMonth = parseInt(project.StartDate.split('-')[0]);
+
                 project.Employees=_vm.infiledList  ;
                
-                
                 for (let j in project.Employees) {
                     if (!project.Employees[j].Id) {
                         project.Employees[j].ProjectNo = _vm.form.ProjectNo;
                     }
                 }
-                project.ProjectFinancList = _vm.FinancialReport;
+                project.ProjectFinancList = _vm.sumList;
                 for (let j in project.ProjectFinancList) {
                     //已存在，编辑
                     if (!project.ProjectFinancList[j].Id) {
@@ -285,10 +280,7 @@
             changeFinancialReportTimeSpan() {
                 var _vm = this;
                 let warning=false;
-                let startMonth = parseInt(moment(this.FinancialReportTimeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
-
-                let endMonth = parseInt(moment(this.FinancialReportTimeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-                for (let i = startMonth; i < endMonth + 1; i++) {
+                for (let i = _vm.startMonth; i < _vm.endMonth + 1; i++) {
                     let exits=false;
                    _vm.FinancialReport.forEach(item=>{
                        if(item.Month== _vm.MonthMapping(i)){
@@ -307,12 +299,35 @@
                 }
                 }
             },
-            changeUtilizationTimeSpan() {
-                var _vm = this;
-                let startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
 
-                let endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-                for (let i = startMonth; i <= endMonth; i++) {
+            changeTimeSpan(){
+                var _vm=this;
+                _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
+                _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
+                let warning=false;
+                for (let i = _vm.startMonth; i < _vm.endMonth + 1; i++) {
+                    let exits=false;
+                   _vm.FinancialReport.forEach(item=>{
+                       if(item.Month== _vm.MonthMapping(i)){
+                        warning=true;
+                        exits=true;
+                       }
+                   })
+                   if(!exits){
+                    this.FinancialReport.push({ Month: _vm.MonthMapping(i) });
+                   }
+                   if(warning){
+                    this.$message({
+                        message: 'The Month is already exits, please try another one',
+                        type: 'warning'
+                    });
+                }
+                }
+            },
+            addEmployee() {
+                var _vm = this;
+
+                for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
                     this.checkList.forEach(element => {
                         let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
                         let exists = false;
@@ -338,14 +353,89 @@
                     });
                 }
             },
-                getProperty(list,property,value){
-                for(let i in list){
-                    if(list[i][property]==value){
+            getProperty(list, property, value) {
+                for (let i in list) {
+                    if (list[i][property] == value) {
                         return list[i];
                     }
                 }
-                
-            }
+            },
+
+            firstToSecond() {
+                this.activeName = 'second';
+            },
+
+            secondToThird() {
+                var _vm = this;
+                this.activeName = 'third';
+                _vm.sum(_vm.infiledList);             
+                console.log(_vm.sumList);
+            },
+            sum(list){
+                var _vm = this;
+
+                let groupList=_vm.groupBy(list,function(item){
+                    return [item.Month];
+                });
+                groupList.forEach(item => {
+                    let HeadCountCost=0;
+                    let ChargesIn=0;
+                    let Contractors=0;
+                    let typeGroups= _vm.groupBy(item,function(innerItem){
+                            return [innerItem.Type];
+                    })
+                    typeGroups.forEach(typeItem => {
+                        if (typeItem[0].Type == 'HC') {
+                            if (typeItem.length > 1) {
+                                HeadCountCost = typeItem.reduce(function (prev, curr, idx, arr) {
+
+                                    return (parseInt(prev.CostRate) * parseInt(prev.WorkDays) + parseInt(curr.CostRate) * parseInt(curr.WorkDays)) * 8;
+                                })
+                            }
+                            else if (typeItem.length = 1) {
+                                HeadCountCost = (parseInt(typeItem[0].CostRate) * parseInt(typeItem[0].WorkDays)) * 8;
+                            }
+
+                        }
+                        else if (typeItem[0].Type == 'EX') {
+                            if (typeItem.length > 1) {
+                                ChargesIn = typeItem.reduce(function (prev, curr, idx, arr) {
+                                    return (parseInt(prev.CostRate) * parseInt(prev.WorkDays) + parseInt(curr.CostRate) * parseInt(curr.WorkDays)) * 8;
+                                })
+                            } else {
+                                ChargesIn = (parseInt(typeItem[0].CostRate) * parseInt(typeItem[0].WorkDays)) * 8;
+                            }
+
+                        }
+                        else if (typeItem[0].Type == 'CO') {
+                            if (typeItem.length > 1) {
+                                Contractors = typeItem.reduce(function (prev, curr, idx, arr) {
+                                return (parseInt(prev.CostRate) * parseInt(prev.WorkDays) + parseInt(curr.CostRate) * parseInt(curr.WorkDays)) * 8;
+                            })
+                            }
+                            else{
+                                Contractors=(parseInt(typeItem[0].CostRate) * parseInt(typeItem[0].WorkDays)) * 8;
+                            }
+
+                        }
+                    })
+                 
+                    _vm.sumList.push({Month:item[0].Month,HeadCountCost:HeadCountCost,ChargesIn:ChargesIn,Contractors:Contractors});
+                });
+            
+                console.log(groupList);
+            },
+            groupBy(array, f) {
+                let groups = {};
+                array.forEach(function (o) {
+                    let group = JSON.stringify(f(o));
+                    groups[group] = groups[group] || [];
+                    groups[group].push(o);
+                });
+                return Object.keys(groups).map(function (group) {
+                    return groups[group];
+                });
+            },
         }
     }
 </script>

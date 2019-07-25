@@ -203,3 +203,4 @@ D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\Pro
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._0719.resources
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07192.resources
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07193.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._0724.resources
