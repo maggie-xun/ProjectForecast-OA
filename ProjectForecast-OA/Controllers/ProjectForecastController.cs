@@ -110,7 +110,23 @@ namespace ProjectForecast_OA.Controllers
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
+                var user = AccountController.LoginUser;
                 var projects = context.projects.ToList();
+                if (user.Role == "Manager")
+                {
+                    projects = (from project in projects
+                                join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
+                                select project).ToList();
+                }
+                else if(user.Role == "Consultant")
+                {
+                    projects = (from project in projects
+                                join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
+                                join country in context.Country on consultant.Country equals country.CountryName
+                                where (consultant.Consultant_Id == user.Consultant_Id&& consultant.Role == user.Role && country.CountryName == user.Country)
+                                select project).ToList();
+                }
+
                 List<ProjectViewModel> projectViewModels = new List<ProjectViewModel>();
                 var projectCost = context.ProjectCosts.GroupBy(x=>x.ProjectNo).ToList();
                 foreach (var project in projects)
@@ -118,6 +134,7 @@ namespace ProjectForecast_OA.Controllers
                     var country = context.Country.Select(x => x).Where(x => x.CountryId == project.CountryId).FirstOrDefault();
                     var customer = context.Customers.Select(x => x).Where(x => x.CustomerId == project.Customer_Id).FirstOrDefault();
                     var consultant = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == project.Consultant_ID).FirstOrDefault();
+
                     ProjectViewModel viewModel = new ProjectViewModel()
                     {
                         ProjectNo = project.ProjectNo,

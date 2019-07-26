@@ -66,31 +66,45 @@
                             </div>
                         </div>
                         @*<div class="form-row">
-                            <div class="col-md-12">
-                                <div class="input-group">
-                                    <div class="input-group-addon">
-                                        <span class="icon-key"></span>
-                                    </div>
-                                    @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "ConfirmPassword" })
-                                </div>
-                                @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
-                            </div>
-                        </div>*@
+                <div class="col-md-12">
+                    <div class="input-group">
+                        <div class="input-group-addon">
+                            <span class="icon-key"></span>
+                        </div>
+                        @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "form-control", placeholder = "ConfirmPassword" })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
                         <div class="form-row">
                             <div class="col-md-12">
                                 <div class="input-group">
                                     <div class="input-group-addon">
                                         <span class="icon-user"></span>
                                     </div>
-                                    @Html.TextBoxFor(m => m.Country, new { @class = "form-control", placeholder = "Country" })
+                                    @Html.DropDownListFor(m => m.Country, new SelectList(ViewBag.Countries))
                                 </div>
                                 @Html.ValidationMessageFor(m => m.Country, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="col-md-12">
+                                <div class="input-group">
+                                    <div class="input-group-addon">
+                                        <span class="icon-user"></span>
+                                    </div>
+                                    @Html.DropDownListFor(m=>m.Role,new SelectList(ViewBag.Roles))
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Role ,"", new { @class = "text-danger" })
                             </div>
                         </div>
 
                         <div class="form-row">
                             <div class="col-md-12">
                                 <input type="submit" value="Signup" class="btn btn-default btn-block btn-clean" />
+                            </div>
+                            <div class="col-md-12">
+                                <input type="submit" value="Cancle" class="btn btn-default btn-block btn-clean" />
                             </div>
                         </div>
                     }

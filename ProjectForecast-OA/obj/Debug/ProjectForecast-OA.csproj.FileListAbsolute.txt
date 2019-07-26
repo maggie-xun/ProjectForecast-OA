@@ -204,3 +204,10 @@ D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\Pro
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07192.resources
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07193.resources
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._0724.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._0725.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._0726.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07262.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07264.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07265.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07266.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._07267.resources

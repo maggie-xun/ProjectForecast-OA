@@ -15,6 +15,7 @@ namespace ProjectForecast_OA.Controllers
     [Authorize]
     public class AccountController : Controller
     {
+        public static Consultant LoginUser;
         // GET: Account
         [HttpGet]
         [AllowAnonymous]
@@ -34,24 +35,26 @@ namespace ProjectForecast_OA.Controllers
                 return View(model);
             }
             EFCodeFirstDbContext context = new EFCodeFirstDbContext();
-            //var valid_users = CovertJsonToDocument<List<UserViewModel>>(this.AbsoluteDataFile("users.json")).FirstOrDefault();
-            var valid_users = context.Users.Select(x=>x).Where(user => user.UserName == model.Name && user.PassWord == model.Password).FirstOrDefault();
+            var valid_users = context.Consultants.Select(x=>x).Where(user => user.Consultant_Name == model.Name && user.PassWord == model.Password).FirstOrDefault();
+            //ViewData["Users"] = valid_users;
+            AccountController.LoginUser = valid_users;
             //var login_user = valid_users.FirstOrDefault(x => model.Name.Equals(x.Account) && model.Password.Equals(x.Password));
             if (valid_users != null)
             {
                 var claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, valid_users.UserName));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, valid_users.Consultant_Name));
                 claims.Add(new Claim(ClaimTypes.Name, valid_users.PassWord));
 
                 var identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
 
+              
                 AuthenticationManager.SignIn(new AuthenticationProperties()
                 {
                     AllowRefresh = true,
                     IsPersistent = model.RememberMe,
                     ExpiresUtc = DateTime.UtcNow.AddMonths(1)
                 }, identity);
-
+                //var user = AuthenticationManager.User;
                 return RedirectToLocal(returnUrl);
             }
             else
@@ -65,6 +68,11 @@ namespace ProjectForecast_OA.Controllers
         [AllowAnonymous]
         public ActionResult Signup(string returnUrl)
         {
+            EFCodeFirstDbContext context = new EFCodeFirstDbContext();
+
+            ViewBag.Countries = context.Country.Select(x => x.CountryName).ToList();
+            //ViewBag.Roles = context.Role.Select(x => x).ToList();
+            ViewBag.Roles = new List<string> { "Manager", "Consultant", "Dev" };
             ViewBag.ReturnUrl = returnUrl;
             return View();
         }
@@ -82,13 +90,14 @@ namespace ProjectForecast_OA.Controllers
             {
                 EFCodeFirstDbContext context = new EFCodeFirstDbContext();
 
-                Users user = new Users()
+                Consultant user = new Consultant()
                 {
-                    UserName=model.Name,
+                    Consultant_Name = model.Name,
                     PassWord=model.Password,
-                    Region=model.Country
+                    Country = model.Country,
+                    Role=model.Role
                 };
-                context.Users.Add(user);
+                context.Consultants.Add(user);
                 context.SaveChanges();
                 return RedirectToLocal(returnUrl);
             }
