@@ -23,7 +23,10 @@
                         <template slot="title">Empoyee Managment</template>
                         <el-menu-item index="employee_add">
                             <router-link to="/employee_add">Add Empoyee</router-link>
-                        </el-menu-item>                    
+                        </el-menu-item>      
+                        <el-menu-item index="employee_list">
+                                <router-link to="/employee_list">Empoyee List</router-link>
+                            </el-menu-item>                   
                     </el-submenu>
                     <el-submenu index='customer_add'>
                             <template slot="title">Customer Managment</template>

@@ -9,6 +9,8 @@ using ProjectForecast_OA.utils;
 using System.Linq;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity;
+using Microsoft.Owin.Security;
+using System.Web;
 
 namespace ProjectForecast_OA.Controllers  
 {
@@ -110,20 +112,23 @@ namespace ProjectForecast_OA.Controllers
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
-                var user = AccountController.LoginUser;
+                //var user = AccountController.LoginUser;
+                var userName = AuthenticationManager.User.Claims.ToList()[0].Value; 
+                var password= AuthenticationManager.User.Claims.ToList()[1].Value;
+                var userLogin = context.Consultants.Select(x => x).Where(x => x.Consultant_Name == userName && x.PassWord == password).FirstOrDefault();
                 var projects = context.projects.ToList();
-                if (user.Role == "Manager")
+                if (userLogin.Role == "Manager")
                 {
                     projects = (from project in projects
                                 join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
                                 select project).ToList();
                 }
-                else if(user.Role == "Consultant")
+                else if(userLogin.Role == "Consultant")
                 {
                     projects = (from project in projects
                                 join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
                                 join country in context.Country on consultant.Country equals country.CountryName
-                                where (consultant.Consultant_Id == user.Consultant_Id&& consultant.Role == user.Role && country.CountryName == user.Country)
+                                where (consultant.Consultant_Id == userLogin.Consultant_Id&& consultant.Role == userLogin.Role && country.CountryName == userLogin.Country)
                                 select project).ToList();
                 }
 
@@ -160,7 +165,13 @@ namespace ProjectForecast_OA.Controllers
                 return Json(projectViewModels, JsonRequestBehavior.AllowGet);
             }
         }
-
+        public IAuthenticationManager AuthenticationManager
+        {
+            get
+            {
+                return HttpContext.GetOwinContext().Authentication;
+            }
+        }
         public ActionResult GetProjectPerId(string id)
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
@@ -321,7 +332,7 @@ namespace ProjectForecast_OA.Controllers
                 return Json(customers, JsonRequestBehavior.AllowGet);
             }
         }
-        public ActionResult DeleteEmployee(int id)
+        public ActionResult DeleteEmployeeWorkdayDetail(int id)
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
@@ -340,6 +351,59 @@ namespace ProjectForecast_OA.Controllers
                 context.ProjectCosts.Remove(consultant);
                 context.SaveChanges();
                 return Json(consultant, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult DeleteEmployee(int id)
+        {
+            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            {
+                var consultant = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == id).FirstOrDefault();
+                context.Consultants.Remove(consultant);
+                context.SaveChanges();
+                return Json(consultant, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult EditEmployee(Consultant consultant)
+        {
+            try
+            {
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    var consultantExits = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == consultant.Consultant_Id).FirstOrDefault();
+                    consultantExits.Consultant_Name = consultant.Consultant_Name;
+                    consultantExits.CostRate = consultant.CostRate;
+                    consultantExits.Country = consultant.Country;
+                    consultantExits.HireDecision = consultant.HireDecision;
+                    consultantExits.Role = consultant.Role;
+                    consultant.Consultant_Contact = consultant.Consultant_Contact;
+                    DbEntityEntry<Consultant> entry = context.Entry(consultantExits);
+                    entry.State = EntityState.Modified;
+                    context.SaveChanges();
+                    return Json(consultant, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
+        }
+
+        public ActionResult GetEmployeePerId(string id)
+        {
+            try
+            {
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    int Id = Convert.ToInt32(id);
+                    var employee = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == Id).FirstOrDefault();
+                    return Json(employee,JsonRequestBehavior.AllowGet);
+                }
+                }catch(Exception e)
+            {
+                return null;
             }
         }
     }

@@ -283,7 +283,7 @@
             },
             deleteRow(index, rows, rowId) {//删除改行
                 rows.splice(index, 1);
-                formData_service.default.deleteEmployee.exec(rowId)
+                formData_service.default.deleteEmployeeWorkdayDetail.exec(rowId)
             },
             deleteFinanceRow(index, rows, rowId) {
                 rows.splice(index, 1);

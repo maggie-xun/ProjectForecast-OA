@@ -2,11 +2,14 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import project_list from "./src/views/Project/project-list";
 import project_add from "./src/views/Project/project-add";
+import employee_list from "./src/views/EmployeeManagment/employee-list";
 import employee_add from "./src/views/EmployeeManagment/employee-add";
+import employee_edit from './src/views/EmployeeManagment/employee-edit'
 import backlog from './src/views/Summary/Backlog';
 import project_detail from './src/views/Project/project-detail'
 import project_edit from './src/views/Project/project-edit'
 import customer_add from './src/views/Customer/customer-add'
+
 Vue.use(VueRouter);
 
 const routes = [
@@ -24,6 +27,16 @@ const routes = [
     name: "employee_add",
     path: "/employee_add",
     component: employee_add
+  },
+  {
+    name: "employee_list",
+    path: "/employee_list",
+    component: employee_list
+  },
+  {
+    name: "employee_edit",
+    path: "/employee_edit",
+    component: employee_edit
   },
   {
     name: "backlog",

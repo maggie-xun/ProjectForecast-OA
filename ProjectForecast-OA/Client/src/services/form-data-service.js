@@ -145,9 +145,9 @@ export default {
     }
   },
 
-  deleteEmployee:{
+  deleteEmployeeWorkdayDetail:{
     url() {
-      return `${host}/ProjectForecast/DeleteEmployee`;
+      return `${host}/ProjectForecast/DeleteEmployeeWorkdayDetail`;
     },
     exec: function(id) {
       return axios.get(this.url(), {
@@ -166,6 +166,48 @@ export default {
         params: {
           id: id
         }
+      });
+    }
+  },
+  deleteEmployee:{
+    url() {
+      return `${host}/ProjectForecast/DeleteEmployee`;
+    },
+    exec: function(id) {
+      return axios.get(this.url(), {
+        params: {
+          id: id
+        }
+      });
+    }
+  },
+  getEmployeeById:{
+    url() {
+      return `${host}/ProjectForecast/GetEmployeePerId`;
+    },
+    exec: function(projectNo) {
+      var _self = this;
+
+      return axios.get(this.url(), {
+        params: {
+          id: projectNo
+        }
+      });
+    }
+  },
+  editEmployee:{
+    url() {
+      return `${host}/ProjectForecast/EditEmployee`;
+    },
+    extc: function(form) {
+      return new Promise((resolve, reject) => {
+        axios.post(this.url(), form)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err);
+          });
       });
     }
   }
