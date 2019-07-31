@@ -210,7 +210,50 @@ export default {
           });
       });
     }
-  }
+  },
+
+  getEmployeeById:{
+    url() {
+      return `${host}/ProjectForecast/GetCustomerPerId`;
+    },
+    exec: function(projectNo) {
+      var _self = this;
+
+      return axios.get(this.url(), {
+        params: {
+          id: projectNo
+        }
+      });
+    }
+  },
+  deleteCustomer:{
+    url() {
+      return `${host}/ProjectForecast/DeleteCustomer`;
+    },
+    exec: function(id) {
+      return axios.get(this.url(), {
+        params: {
+          id: id
+        }
+      });
+    }
+  },
+  editCustomer:{
+    url() {
+      return `${host}/ProjectForecast/EditCustomer`;
+    },
+    extc: function(form) {
+      return new Promise((resolve, reject) => {
+        axios.post(this.url(), form)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    }
+  },
 };
 //然后再修改原型链
 // Vue.prototype.$http = axios;

@@ -29,11 +29,14 @@
                             </el-menu-item>                   
                     </el-submenu>
                     <el-submenu index='customer_add'>
-                            <template slot="title">Customer Managment</template>
-                            <el-menu-item index='customer_add'>
-                                <router-link to="/customer_add">Add Customer</router-link>
-                            </el-menu-item>                    
-                        </el-submenu>
+                        <template slot="title">Customer Managment</template>
+                        <el-menu-item index='customer_add'>
+                            <router-link to="/customer_add">Add Customer</router-link>
+                        </el-menu-item>
+                        <el-menu-item index='customer_list'>
+                            <router-link to="/customer_list">Customer List</router-link>
+                        </el-menu-item>
+                    </el-submenu>
                     <<el-menu-item>
                         <router-link to="/backlog">Backlog</router-link>
                     </el-menu-item>

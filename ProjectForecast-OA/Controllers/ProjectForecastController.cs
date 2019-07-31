@@ -406,5 +406,54 @@ namespace ProjectForecast_OA.Controllers
                 return null;
             }
         }
+
+        public ActionResult GetCustomerPerId(string id)
+        {
+            try
+            {
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    int Id = Convert.ToInt32(id);
+                    var employee = context.Customers.Select(x => x).Where(x => x.CustomerId == Id).FirstOrDefault();
+                    return Json(employee, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch(Exception e)
+            {
+                return null;
+            }
+        }
+
+        public ActionResult EditCustomer(Customer customer)
+        {
+            try
+            {
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    var customerExits = context.Customers.Select(x => x).Where(x => x.CustomerId == customer.CustomerId).FirstOrDefault();
+                    customerExits.Customer_name= customer.Customer_name;
+                    customerExits.Customer_Contact = customer.Customer_Contact;
+                    DbEntityEntry<Customer> entry = context.Entry(customerExits);
+                    entry.State = EntityState.Modified;
+                    context.SaveChanges();
+                    return Json(customerExits, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
+        public ActionResult DeleteCustomer(int id)
+        {
+            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            {
+                var customer = context.Customers.Select(x => x).Where(x => x.CustomerId == id).FirstOrDefault();
+                context.Customers.Remove(customer);
+                context.SaveChanges();
+                return Json(customer, JsonRequestBehavior.AllowGet);
+            }
+        }
     }
 }

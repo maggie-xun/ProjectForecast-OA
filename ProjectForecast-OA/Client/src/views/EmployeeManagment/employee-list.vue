@@ -11,10 +11,10 @@
             </el-table-column>
             <el-table-column fixed="right" label="Operation">
                 <template slot-scope="scope">
-                    <el-button @click.native.prevent="EditEmployee(scope.row.Consultant_Id)"
-                        size="small"> Edit
+                    <el-button @click.native.prevent="EditEmployee(scope.row.Consultant_Id)" size="small"> Edit
                     </el-button>
-                    <el-button @click.native.prevent="deleteEmployee(scope.$index, employeeList,scope.row.Consultant_Id)"
+                    <el-button
+                        @click.native.prevent="deleteEmployee(scope.$index, employeeList,scope.row.Consultant_Id)"
                         size="small"> Remove
                     </el-button>
                 </template>
@@ -23,55 +23,41 @@
     </div>
 </template>
 <script>
-        var formData_service = require('./../../services/form-data-service');
-        export default {
-          data() {
+    var formData_service = require('./../../services/form-data-service');
+    export default {
+        data() {
             return {
-              employeeList: [],
-              form: {
-                name: ","
-              },
-              activeName: '',
-              loading: false,
-              projects: [],
-              projectFinance: [],
+                employeeList: [],
+                form: {
+                    name: ","
+                },
+                activeName: '',
+                loading: false,
+                projects: [],
+                projectFinance: [],
             }
-          },
-          created() {
+        },
+        created() {
             this.loading = true;
             formData_service.default.getAllEmployee.extc()
                 .then(data => {
                     this.employeeList = data.data;
-                    this.loading=false;
-                });     
-          },
-          methods: {  
-            handleNodeClick(data) {
-              console.log(data);
-            },
-            handleClick(tab, event) {
-              console.log(tab, event);
-            },
-            getProjectDetails(row) {
-              this.$router.push({
-                name: 'project_detail',
-                params: {
-                  item: row.ProjectNo
-                }
-              })
-            },
+                    this.loading = false;
+                });
+        },
+        methods: {
             deleteEmployee(index, rows, rowId) {
-                  rows.splice(index, 1);
-                  formData_service.default.deleteEmployee.exec(rowId);
-              },
-              EditEmployee(rowId) {
-                  this.$router.push({
-                      name: 'employee_edit',
-                      params: {
-                          item: rowId
-                      }
-                  })
-              }
-          }
+                rows.splice(index, 1);
+                formData_service.default.deleteEmployee.exec(rowId);
+            },
+            EditEmployee(rowId) {
+                this.$router.push({
+                    name: 'employee_edit',
+                    params: {
+                        item: rowId
+                    }
+                })
+            }
         }
-      </script>
+    }
+</script>

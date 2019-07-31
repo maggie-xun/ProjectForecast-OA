@@ -9,6 +9,8 @@ import backlog from './src/views/Summary/Backlog';
 import project_detail from './src/views/Project/project-detail'
 import project_edit from './src/views/Project/project-edit'
 import customer_add from './src/views/Customer/customer-add'
+import customer_list from './src/views/Customer/customer-list'
+import customer_edit from './src/views/Customer/customer-edit'
 
 Vue.use(VueRouter);
 
@@ -57,6 +59,16 @@ const routes = [
     name: "customer_add",
     path: "/customer_add",
     component: customer_add
+  },
+  {
+    name: "customer_list",
+    path: "/customer_list",
+    component: customer_list
+  },
+  {
+    name: "customer_edit",
+    path: "/customer_edit",
+    component: customer_edit
   },
 ];
 

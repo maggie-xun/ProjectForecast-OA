@@ -34,13 +34,13 @@ namespace ProjectForecast_OA.Controllers
                 return View(model);
             }
             EFCodeFirstDbContext context = new EFCodeFirstDbContext();
-            var valid_users = context.Users.Select(x=>x).Where(user => user.UserName == model.Name && user.PassWord == model.Password).FirstOrDefault();
+            var valid_users = context.Consultants.Select(x=>x).Where(user => user.Consultant_Name == model.Name && user.PassWord == model.Password).FirstOrDefault();
             ViewData["Users"] = valid_users;
             //var login_user = valid_users.FirstOrDefault(x => model.Name.Equals(x.Account) && model.Password.Equals(x.Password));
             if (valid_users != null)
             {
                 var claims = new List<Claim>();
-                claims.Add(new Claim(ClaimTypes.NameIdentifier, valid_users.UserName));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, valid_users.Consultant_Name));
                 claims.Add(new Claim(ClaimTypes.Name, valid_users.PassWord));
 
                 var identity = new ClaimsIdentity(claims, DefaultAuthenticationTypes.ApplicationCookie);
