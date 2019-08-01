@@ -109,25 +109,25 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="HeadCountCost" label="HeadCountCost" style="width:6vw;">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.HeadCountCost"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="ChargesIn" label="ChargesIn" style="width:6vw;">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.ChargesIn"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="Contractors" label="Contractors" style="width:6vw;">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.Contractors"></el-input>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="GP" label="GP" style="width:6vw;">
-                            <template scope="scope">
-                                <el-input size="mini" v-model="scope.row.GP"></el-input>
-                            </template>
-                        </el-table-column>
+                        <template scope="scope">
+                            <el-input size="mini" v-model="scope.row.HeadCountCost"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="ChargesIn" label="ChargesIn" style="width:6vw;">
+                        <template scope="scope">
+                            <el-input size="mini" v-model="scope.row.ChargesIn"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="Contractors" label="Contractors" style="width:6vw;">
+                        <template scope="scope">
+                            <el-input size="mini" v-model="scope.row.Contractors"></el-input>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="GP" label="GP" style="width:6vw;">
+                        <template scope="scope">
+                            <el-input size="mini" v-model="scope.row.GP"></el-input>
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="Revenue" label="Revenue" style="width:6vw;">
                         <template scope="scope">
                             <el-input size="mini" v-model="scope.row.Revenue"></el-input>
@@ -188,7 +188,7 @@
                 loading: false,
                 sumList: [],
                 active: 0,
-                word:'Next'
+                word: 'Next'
             }
         },
         created() {
@@ -220,7 +220,7 @@
                             _vm.form.Consultant = { Consultant_Id: '' }
                         }
                         _vm.infiledList = _vm.detailData.Employees;
-                        _vm.timeSpan=[_vm.form.StartDate,_vm.form.CloseDate];
+                        _vm.timeSpan = [_vm.form.StartDate, _vm.form.CloseDate];
                         _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                         _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                         _vm.FinancialReport = _vm.detailData.ProjectFinancList;
@@ -240,44 +240,43 @@
         methods: {
             next() {
                 var _vm = this;
-                if (this.active <= 2) 
-                {
+                if (this.active <= 2) {
                     if (this.active == 1) {
-                    _vm.sum(_vm.infiledList);
-                    _vm.word='Save';
-                }
-                if (this.active == 2) {
-                    var _vm = this;
-                    let project = this.form;
-                    project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
-                    project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
-                    project.Country = _vm.form.Country;
-                    project.Employees = _vm.infiledList;
-
-                    for (let j in project.Employees) {
-                        if (!project.Employees[j].Id) {
-                            project.Employees[j].ProjectNo = _vm.form.ProjectNo;
-                        }
+                        _vm.sum(_vm.infiledList);
+                        _vm.word = 'Save';
                     }
-                    project.ProjectFinancList = _vm.sumList;
-                    for (let j in project.ProjectFinancList) {
-                        //已存在，编辑
-                        if (!project.ProjectFinancList[j].Id) {
-                            project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
-                        }
-                    }
+                    if (this.active == 2) {
+                        var _vm = this;
+                        let project = this.form;
+                        project.CloseDate = moment(this.timeSpan[0]).format('MM-DD-YYYY');
+                        project.StartDate = moment(this.timeSpan[1]).format('MM-DD-YYYY');
+                        project.Country = _vm.form.Country;
+                        project.Employees = _vm.infiledList;
 
-                    formData_service.default.editProject.extc(project)
-                        .then(() => {
-                            this.$router.push({
-                                name: 'project_edit',
-                                params: {
-                                    item: project.ProjectNo
-                                }
+                        for (let j in project.Employees) {
+                            if (!project.Employees[j].Id) {
+                                project.Employees[j].ProjectNo = _vm.form.ProjectNo;
+                            }
+                        }
+                        project.ProjectFinancList = _vm.sumList;
+                        for (let j in project.ProjectFinancList) {
+                            //已存在，编辑
+                            if (!project.ProjectFinancList[j].Id) {
+                                project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
+                            }
+                        }
+
+                        formData_service.default.editProject.extc(project)
+                            .then(() => {
+                                this.$router.push({
+                                    name: 'project_edit',
+                                    params: {
+                                        item: project.ProjectNo
+                                    }
+                                })
                             })
-                        })
-                }
-                this.active++;
+                    }
+                    this.active++;
                 }
 
             },
@@ -310,28 +309,28 @@
                     });
                 }
             },
-            changeTimeSpan(){
-                var _vm=this;
+            changeTimeSpan() {
+                var _vm = this;
                 _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                 _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-                let warning=false;
+                let warning = false;
                 for (let i = _vm.startMonth; i < _vm.endMonth + 1; i++) {
-                    let exits=false;
-                   _vm.FinancialReport.forEach(item=>{
-                       if(item.Month== _vm.MonthMapping(i)){
-                        warning=true;
-                        exits=true;
-                       }
-                   })
-                   if(!exits){
-                    this.FinancialReport.push({ Month: _vm.MonthMapping(i) });
-                   }
-                   if(warning){
-                    this.$message({
-                        message: 'The Month is already exits, please try another one',
-                        type: 'warning'
-                    });
-                }
+                    let exits = false;
+                    _vm.FinancialReport.forEach(item => {
+                        if (item.Month == _vm.MonthMapping(i)) {
+                            warning = true;
+                            exits = true;
+                        }
+                    })
+                    if (!exits) {
+                        this.FinancialReport.push({ Month: _vm.MonthMapping(i) });
+                    }
+                    if (warning) {
+                        this.$message({
+                            message: 'The Month is already exits, please try another one',
+                            type: 'warning'
+                        });
+                    }
                 }
             },
             groupBy(array, f) {
@@ -410,6 +409,7 @@
                     return [item.Month];
                 });
                 groupList.forEach(item => {
+                    let exits = false;
                     let HeadCountCost = 0;
                     let ChargesIn = 0;
                     let Contractors = 0;
@@ -451,17 +451,26 @@
 
                         }
                     })
-                    let exits=false;
-for(let i in _vm.FinancialReport){
-    if(_vm.FinancialReport[i].Month==item[0].Month){
-        exits=true;
-        _vm.sumList.push(_vm.FinancialReport[i]);
-    }
-}
-if(!exits){
-    _vm.sumList.push({Month: item[0].Month, HeadCountCost: HeadCountCost, ChargesIn: ChargesIn, Contractors: Contractors });
-}
-                    
+                    let inSumList = false;
+                    for (let i in _vm.FinancialReport) {
+
+                        // for (let j in _vm.sumList) {
+                        //     if (_vm.FinancialReport[i].Month == _vm.sumList[j].Month) {
+                        //         inSumList = true;
+                        //     }
+                        // }
+                        inSumList=  _vm.getProperty(_vm.sumList,'Month',_vm.FinancialReport[i].Month);
+                        if (_vm.FinancialReport[i].HeadCountCost && !inSumList) {
+                            exits = true;
+                            _vm.sumList.push(_vm.FinancialReport[i]);
+                        }
+                    }
+
+                  
+                    if (!exits&&!inSumList) {
+                        _vm.sumList.push({ Month: item[0].Month, HeadCountCost: HeadCountCost, ChargesIn: ChargesIn, Contractors: Contractors });
+                    }
+
                 });
 
                 console.log(groupList);
