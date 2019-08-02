@@ -30,7 +30,7 @@
                                         <el-input v-model="form.CloseDate" :disabled="true"></el-input>
                                 </el-form-item>
                                 <el-form-item>
-                                    <el-button type="primary">Add Now</el-button>
+                                    <el-button type="primary" @click='NextPage'>Add Now</el-button>
                                 </el-form-item>
                             </el-form>
                         </el-tab-pane>
@@ -58,7 +58,8 @@
                                                     </template>
                                                 </el-table-column>
                                     </el-table>
-                            <el-button type="primary">Save</el-button>
+                                    <project_utilization></project_utilization>
+         
 
                         </el-tab-pane>
                         <el-tab-pane label="FinancialReport" name="third">
@@ -69,6 +70,26 @@
                                             <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
                                         </template>
                                     </el-table-column>
+                                    <el-table-column prop="HeadCountCost" label="HeadCountCost" style="width:6vw;">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.HeadCountCost" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="ChargesIn" label="ChargesIn" style="width:6vw;">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.ChargesIn" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="Contractors" label="Contractors" style="width:6vw;">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.Contractors" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column prop="GP" label="GP" style="width:6vw;">
+                                            <template scope="scope">
+                                                <el-input size="mini" v-model="scope.row.GP" disabled="disabled"></el-input>
+                                            </template>
+                                        </el-table-column>
                                     <el-table-column prop="Revenue" label="Revenue" style="width:6vw;">
                                         <template scope="scope">
                                             <el-input size="mini" v-model="scope.row.Revenue" disabled="disabled"></el-input>
@@ -98,8 +119,12 @@
       </template>
       <script>
         var formData_service = require('./../../services/form-data-service');
+        var project_utilization=require('./utilization_all_column').default;
         var moment = require('moment');
         export default {
+            components:{
+                project_utilization
+            },
           data() {
             return {
               detailData:{ },
@@ -123,71 +148,56 @@
             _vm.projectId = this.$route.params.item;
             formData_service.default.getProjectPerId.exec(_vm.projectId)
               .then(data => {
-                _vm.detailData = data.data[0];
-                _vm.form=_vm.detailData;
-                _vm.timeSpan = [_vm.form.StartDate, _vm.form.CloseDate];
-                // _vm.infiledList=_vm.detailData.Employees;
-                _vm.FinancialReport=_vm.detailData.ProjectFinancList;
-                _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
-                        _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-for(let i=_vm.startMonth;i<=_vm.endMonth;i++){
-    this.months.push(i);
-}
-                let result = _vm.groupBy(_vm.detailData.Employees, function (item) {
-                            return [item.Consultant_Id];
-                        })
+                  _vm.detailData = data.data[0];
+                  _vm.form = _vm.detailData;
+                  _vm.timeSpan = [_vm.form.StartDate, _vm.form.CloseDate];
+                  // _vm.infiledList=_vm.detailData.Employees;
+                  _vm.FinancialReport = _vm.detailData.ProjectFinancList;
+                  _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
+                  _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
+                  for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                      this.months.push(i);
+                  }
+                  let result = _vm.groupBy(_vm.detailData.Employees, function (item) {
+                      return [item.Consultant_Id];
+                  })
 
-                        result.forEach(employee => {
-                            let consultant_show = { Id: employee[0].Id, Consultant_Id: employee[0].Consultant_Id, Consultant_Name: employee[0].Consultant_Name, Type: employee[0].Type, CostRate: employee[0].CostRate, ProjectNo: this.form.ProjectNo, Month: employee[0].Month, };
-                            let MonthElement = [];
-                            employee.forEach(monthElement => {
-                                let exits = false;
-                                for (let j in _vm.months)
-                                {
-                                    if (_vm.months[j] == _vm.MonthMappingReverse(monthElement.Month)) {
-                                        exits = true;
-                                        if((_vm.getProperty(MonthElement,'Month', _vm.MonthMapping(_vm.months[j])))&&(_vm.getProperty(MonthElement,'Month', _vm.MonthMapping(_vm.months[j])).WorkingHour==0))
-                                        {
-                                            MonthElement.forEach(a=>{
-                                                if(a.Month==monthElement.Month)
-                                                {
-                                                    a.WorkingHour=monthElement.WorkDays;
-                                                }
-                                            })
-                                        
-                                        }
-                                        else if(!(_vm.getProperty( MonthElement,'Month', _vm.MonthMapping(_vm.months[j]))))
-                                        {
-                                            MonthElement.push({ Month: monthElement.Month, WorkingHour: monthElement.WorkDays })
-                                        }
-                                    }
-                                    else{
-                                        if(!(_vm.getProperty( MonthElement,'Month', _vm.MonthMapping(_vm.months[j]))))
-                                        {
-                                            MonthElement.push({ Month: _vm.MonthMapping(_vm.months[j]), WorkingHour: 0})
-                                        }
-                                        
-                                    }
+                  result.forEach(employee => {
+                      let consultant_show = { Id: employee[0].Id, Consultant_Id: employee[0].Consultant_Id, Consultant_Name: employee[0].Consultant_Name, Type: employee[0].Type, CostRate: employee[0].CostRate, ProjectNo: this.form.ProjectNo, Month: employee[0].Month, };
+                      let MonthElement = [];
+                      employee.forEach(monthElement => {
+                          let exits = false;
+                          for (let j in _vm.months) {
+                              if (_vm.months[j] == _vm.MonthMappingReverse(monthElement.Month)) {
+                                  exits = true;
+                                  if ((_vm.getProperty(MonthElement, 'Month', _vm.MonthMapping(_vm.months[j]))) && (_vm.getProperty(MonthElement, 'Month', _vm.MonthMapping(_vm.months[j])).WorkingHour == 0)) {
+                                      MonthElement.forEach(a => {
+                                          if (a.Month == monthElement.Month) {
+                                              a.WorkingHour = monthElement.WorkDays;
+                                          }
+                                      })
 
-                                }
-                                // if (!exits) {
-                                //     // _vm.months.push(_vm.MonthMappingReverse(monthElement.Month));
-                                //     MonthElement.push({ Month: _vm.months[j], WorkingHour: 0})
-                                // }
-                                // else{
-                                //     MonthElement.push({ Month: monthElement.Month, WorkingHour: monthElement.WorkDays })
-                            
-                                // }
+                                  }
+                                  else if (!(_vm.getProperty(MonthElement, 'Month', _vm.MonthMapping(_vm.months[j])))) {
+                                      MonthElement.push({ Month: monthElement.Month, WorkingHour: monthElement.WorkDays })
+                                  }
+                              }
+                              else {
+                                  if (!(_vm.getProperty(MonthElement, 'Month', _vm.MonthMapping(_vm.months[j])))) {
+                                      MonthElement.push({ Month: _vm.MonthMapping(_vm.months[j]), WorkingHour: 0 })
+                                  }
 
-                               
+                              }
 
-                            });
-                            consultant_show.MonthElement = MonthElement;
-                            _vm.infiledList.push(consultant_show);
-                        });
-                        _vm.months.sort();
+                          }
+                      });
+                      consultant_show.MonthElement = MonthElement;
+                      _vm.infiledList.push(consultant_show);
+                  });
+                  _vm.months.sort();
+
+
                 _vm.loading=false;
-                console.log(_vm.form);
               });
            
       
@@ -266,4 +276,18 @@ for(let i=_vm.startMonth;i<=_vm.endMonth;i++){
           list-style: none;
           height: 40p;
         }
+
+        
+  #project_column{
+    width: 600px;
+    height: 400px;
+    border: 1px solid red;
+    display:inline-block;
+  }
+  #monthly_pie{
+    width: 600px;
+    height: 400px;
+    border: 1px solid red;
+    display:inline-block;
+  }
       </style>

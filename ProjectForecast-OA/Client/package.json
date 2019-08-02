@@ -4,7 +4,7 @@
   "description": "A Vue.js project",
   "author": "Hainan",
   "private": true,
-  "scripts":  {
+  "scripts": {
     "buildDev": "webpack --color",
     "watch": "webpack --watch",
     "buildProd": "SET NODE_ENV=production && webpack -p --color"
@@ -12,6 +12,7 @@
   "dependencies": {
     "axios": "^0.19.0",
     "babel-polyfill": "^6.26.0",
+    "echarts": "^4.2.1",
     "element-ui": "^2.9.1",
     "moment": "^2.24.0",
     "vue": "^2.6.10",
