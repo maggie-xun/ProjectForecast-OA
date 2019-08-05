@@ -7,199 +7,159 @@
 
 <script>
     var echarts = require('echarts');
+    var ecConfig = echarts.config;
     require('echarts/lib/chart/bar');
     require('echarts/lib/component/tooltip');
     require('echarts/lib/component/title');
+    var formData_service = require('./../../services/form-data-service');
     export default {
+        props: ['utilizationData', 'projectNo'],
         data() {
-            return {}
+            return {
+                columnData: [],
+                columnxAxis: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                pieData: [],
+                pie: {}
+            }
         },
+
         mounted() {
             var myChart = echarts.init(document.getElementById("project_column"));
-            var pie = echarts.init(document.getElementById("monthly_pie"));
-            var poeoption = {
-                backgroundColor: '#2c343c',
+            this.pie = echarts.init(document.getElementById("monthly_pie"));
 
-                title: {
-                    text: 'Customized Pie',
-                    left: 'center',
-                    top: 20,
-                    textStyle: {
-                        color: '#ccc'
-                    }
-                },
 
-                tooltip: {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
+            this.columnxAxis.forEach((ele, index) => {
+                if (this.getProperty(this.utilizationData, 'Month', ele)) {
+                    this.columnData.push(this.getProperty(this.utilizationData, 'Month', ele).TotalWorkDays);
+                }
+                else {
+                    this.columnData.push(0);
+                }
+            });
 
-                visualMap: {
-                    show: false,
-                    min: 80,
-                    max: 600,
-                    inRange: {
-                        colorLightness: [0, 1]
-                    }
-                },
-                series: [
-                    {
-                        name: '访问来源',
-                        type: 'pie',
-                        radius: '55%',
-                        center: ['50%', '50%'],
-                        data: [
-                            { value: 335, name: '直接访问' },
-                            { value: 310, name: '邮件营销' },
-                            { value: 274, name: '联盟广告' },
-                            { value: 235, name: '视频广告' },
-                            { value: 400, name: '搜索引擎' }
-                        ].sort(function (a, b) { return a.value - b.value; }),
-                        roseType: 'radius',
-                        label: {
-                            normal: {
-                                textStyle: {
-                                    color: 'rgba(255, 255, 255, 0.3)'
-                                }
-                            }
-                        },
-                        labelLine: {
-                            normal: {
-                                lineStyle: {
-                                    color: 'rgba(255, 255, 255, 0.3)'
-                                },
-                                smooth: 0.2,
-                                length: 10,
-                                length2: 20
-                            }
-                        },
-                        itemStyle: {
-                            normal: {
-                                color: '#c23531',
-                                shadowBlur: 200,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        },
+            formData_service.default.getProjectMonthlyUtilization.exec(this.projectNo, this.utilizationData[0].Month)
+                .then(data => {
+                    data.data.forEach(x => {
+                        this.pieData.push({
+                            value: x.WorkDays,
+                            name: x.Name
+                        })
+                    });
+                    console.log(this.pieData)
+                    this.drawPie();
+                });
 
-                        animationType: 'scale',
-                        animationEasing: 'elasticOut',
-                        animationDelay: function (idx) {
-                            return Math.random() * 200;
-                        }
-                    }
-                ]
-            };
-
-            pie.setOption(poeoption,true);
             myChart.setOption({
                 title: {
-                    text: 'ECharts 入门示例'
+                    text: ''
                 },
                 tooltip: {},
                 xAxis: {
-                    data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
+                    data: this.columnxAxis
                 },
                 yAxis: {},
                 series: [{
                     name: '销量',
                     type: 'bar',
-                    data: [5, 20, 36, 10, 10, 20]
+                    data: this.columnData
                 }]
             });
+
+            myChart.on('click', 'series', function (params) {
+                console.log("click");
+            })
         },
         created() {
-            var myChart = echarts.init(document.getElementById("project_column"));
-            myChart.setOption({
-                title: {
-                    text: 'ECharts 入门示例'
-                },
-                tooltip: {},
-                xAxis: {
-                    data: ['衬衫', '羊毛衫', '雪纺衫', '裤子', '高跟鞋', '袜子']
-                },
-                yAxis: {},
-                series: [{
-                    name: '销量',
-                    type: 'bar',
-                    data: [5, 20, 36, 10, 10, 20]
-                }]
-            });
 
-            var pie = echarts.init(document.getElementById("monthly_pie"));
-            var poeoption = {
-                backgroundColor: '#2c343c',
-
-                title: {
-                    text: 'Customized Pie',
-                    left: 'center',
-                    top: 20,
-                    textStyle: {
-                        color: '#ccc'
+        },
+        methods: {
+            getProperty(list, property, value) {
+                for (let i in list) {
+                    if (list[i][property] == value) {
+                        return list[i];
                     }
-                },
+                }
 
-                tooltip: {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b} : {c} ({d}%)"
-                },
+            },
 
-                visualMap: {
-                    show: false,
-                    min: 80,
-                    max: 600,
-                    inRange: {
-                        colorLightness: [0, 1]
-                    }
-                },
-                series: [
-                    {
-                        name: '访问来源',
-                        type: 'pie',
-                        radius: '55%',
-                        center: ['50%', '50%'],
-                        data: [
-                            { value: 335, name: '直接访问' },
-                            { value: 310, name: '邮件营销' },
-                            { value: 274, name: '联盟广告' },
-                            { value: 235, name: '视频广告' },
-                            { value: 400, name: '搜索引擎' }
-                        ].sort(function (a, b) { return a.value - b.value; }),
-                        roseType: 'radius',
-                        label: {
-                            normal: {
-                                textStyle: {
-                                    color: 'rgba(255, 255, 255, 0.3)'
-                                }
-                            }
-                        },
-                        labelLine: {
-                            normal: {
-                                lineStyle: {
-                                    color: 'rgba(255, 255, 255, 0.3)'
-                                },
-                                smooth: 0.2,
-                                length: 10,
-                                length2: 20
-                            }
-                        },
-                        itemStyle: {
-                            normal: {
-                                color: '#c23531',
-                                shadowBlur: 200,
-                                shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            }
-                        },
+            drawPie() {
+                var option = {
+                    // backgroundColor: '#2c343c',
 
-                        animationType: 'scale',
-                        animationEasing: 'elasticOut',
-                        animationDelay: function (idx) {
-                            return Math.random() * 200;
+                    title: {
+                        text: 'Customized Pie',
+                        left: 'center',
+                        top: 20,
+                        // textStyle: {
+                        //     color: '#ccc'
+                        // }
+                    },
+
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b} : {c} ({d}%)"
+                    },
+
+                    visualMap: {
+                        show: false,
+                        min: 80,
+                        max: 600,
+                        inRange: {
+                            colorLightness: [0, 1]
                         }
-                    }
-                ]
+                    },
+                    series: [
+                        {
+                            name: '访问来源',
+                            type: 'pie',
+                            radius: '55%',
+                            center: ['50%', '50%'],
+                            data: this.pieData.sort(function (a, b) { return (a.value - b.value) ; }),
+                            roseType: 'radius',
+                            // label: {
+                            //     normal: {
+                            //         textStyle: {
+                            //             color: 'rgba(255, 255, 255, 0.3)'
+                            //         }
+                            //     }
+                            // },
+                            // labelLine: {
+                            //     normal: {
+                            //         lineStyle: {
+                            //             color: 'rgba(255, 255, 255, 0.3)'
+                            //         },
+                            //         smooth: 0.2,
+                            //         length: 10,
+                            //         length2: 20
+                            //     }
+                            // },
+                            // itemStyle: {
+                            //     normal: {
+                            //         color: '#c23531',
+                            //         shadowBlur: 200,
+                            //         shadowColor: 'rgba(0, 0, 0, 0.5)'
+                            //     }
+                            // },
+                            itemStyle: {
+                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
+            },
+
+                            animationType: 'scale',
+                            animationEasing: 'elasticOut',
+                            animationDelay: function (idx) {
+                                return Math.random() * 200;
+                            }
+                        }
+                    ]
+                };
+
+                this.pie.setOption(option, true);
             }
-            pie.setOption(poeoption,true);
-        }
+        },
     }
 
 </script>

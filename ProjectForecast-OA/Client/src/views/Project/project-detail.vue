@@ -58,9 +58,7 @@
                                                     </template>
                                                 </el-table-column>
                                     </el-table>
-                                    <project_utilization></project_utilization>
-         
-
+                                    <project_utilization v-bind:utilizationData="totalUtilization" v-bind:projectNo='projectId'></project_utilization>
                         </el-tab-pane>
                         <el-tab-pane label="FinancialReport" name="third">
                             <div class="block">        
@@ -140,6 +138,7 @@
               startMonth:0,
               endMonth:0,
               FinancialReportMonths: [],
+              totalUtilization:[]
             }
           },
           created() {
@@ -148,8 +147,9 @@
             _vm.projectId = this.$route.params.item;
             formData_service.default.getProjectPerId.exec(_vm.projectId)
               .then(data => {
-                  _vm.detailData = data.data[0];
+                  _vm.detailData = data.data;
                   _vm.form = _vm.detailData;
+                  _vm.totalUtilization=_vm.detailData.TeamUtilization;
                   _vm.timeSpan = [_vm.form.StartDate, _vm.form.CloseDate];
                   // _vm.infiledList=_vm.detailData.Employees;
                   _vm.FinancialReport = _vm.detailData.ProjectFinancList;

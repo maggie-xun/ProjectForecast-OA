@@ -18,5 +18,11 @@ namespace ProjectForecast_OA.Models
         public string CloseDate { get; set; }
         public List<Consultant_Workday_Details> Employees{ get; set;}
         public List<Project_Financial_Report> ProjectFinancList { get; set; }
+        public List<TeamUtilization> TeamUtilization { get; set; }
     }
+public class TeamUtilization
+{
+    public string Month { get; set; }
+    public int TotalWorkDays { get; set; }
+}
 }

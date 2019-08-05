@@ -35,9 +35,22 @@ export default {
         }
       });
 
-      //   .then((data)=>{
-      //       return data.data;
-      //   })
+    }
+  },
+  getProjectMonthlyUtilization:{
+    url() {
+      return `${host}/ProjectForecast/GetPersonalUtilization`;
+    },
+    exec: function(projectId,month) {
+      var _self = this;
+
+      return axios.get(this.url(), {
+        params: {
+          projectId: projectId,
+          month:month
+        }
+      });
+
     }
   },
   getAllEmployee: {

@@ -176,12 +176,12 @@ namespace ProjectForecast_OA.Controllers
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
-                var projects = context.projects.Where(x=>x.ProjectNo==id).ToList();
+                var project = context.projects.Where(x=>x.ProjectNo==id).FirstOrDefault();
                 List<ProjectViewModel> projectViewModels = new List<ProjectViewModel>();
                 var projectCost = context.ProjectCosts.GroupBy(x => x.ProjectNo).ToList();
                 var workday_Details = context.Consultant_Workday_Details.ToList();
-                var employees = from project in projects
-                                join employee in workday_Details on project.ProjectNo equals employee.ProjectNo.ToString()
+                var employees = from employee in workday_Details
+                                where employee.ProjectNo == id
                                select new Consultant_Workday_Details
                                 {
                                    Id = employee.Id,
@@ -190,13 +190,22 @@ namespace ProjectForecast_OA.Controllers
                                     CostRate=employee.CostRate,
                                     Type=employee.Type,
                                     Month = employee.Month,
-                                    ProjectNo = project.ProjectNo,
+                                    ProjectNo = id,
                                     WorkDays = employee.WorkDays,
                                     Year = employee.Year
                                 };
-                foreach (var project in projects)
-                {
-                    var country = context.Country.Select(x => x).Where(x => x.CountryId == project.CountryId).FirstOrDefault();
+
+                var teamUtilization = from utilization in workday_Details
+                                      where utilization.ProjectNo == id
+                                      group utilization by utilization.Month
+                                      into s                                    
+                                      select new TeamUtilization
+                                      {
+                                          Month= s.Select(x=>x.Month).FirstOrDefault(),
+                                          TotalWorkDays = s.Sum(x=>x.WorkDays)
+                                      };
+
+                var country = context.Country.Select(x => x).Where(x => x.CountryId == project.CountryId).FirstOrDefault();
                     var customer = context.Customers.Select(x => x).Where(x => x.CustomerId == project.Customer_Id).FirstOrDefault();
                     var consultant = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == project.Consultant_ID).FirstOrDefault();
                     ProjectViewModel viewModel = new ProjectViewModel()
@@ -219,12 +228,31 @@ namespace ProjectForecast_OA.Controllers
                             viewModel.ProjectFinancList = item.ToList();
                         }
                     }
-
-                    projectViewModels.Add(viewModel);
-                }
+                viewModel.TeamUtilization = teamUtilization.ToList();
+                               
                 context.SaveChanges();
-                return Json(projectViewModels, JsonRequestBehavior.AllowGet);
+                return Json(viewModel, JsonRequestBehavior.AllowGet);
             }
+        }
+
+        public ActionResult GetPersonalUtilization(string projectId,string month)
+        {
+
+            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            {
+                var workday_Details = context.Consultant_Workday_Details.ToList();
+                var personalUtilization = from utilization in workday_Details
+                                          where (utilization.ProjectNo == projectId && utilization.Month == month)
+                                          group utilization by utilization.Consultant_Id
+                                          into s
+                                          select new
+                                          {
+                                              Name = s.FirstOrDefault().Consultant_Name,
+                                              WorkDays = s.Sum(x => x.WorkDays)
+                                          };
+                return Json(personalUtilization.ToList(), JsonRequestBehavior.AllowGet);
+            }
+           
         }
 
         public ActionResult GetAllCountry()
