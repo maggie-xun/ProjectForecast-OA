@@ -85,6 +85,10 @@ namespace ProjectForecast_OA.Controllers
             //}
             try
             {
+                if (model.Password != model.ConfirmPassword)
+                {
+                    ModelState.AddModelError("", "注册不合法！");
+                }
                 EFCodeFirstDbContext context = new EFCodeFirstDbContext();
 
                 Consultant user = new Consultant()

@@ -2,7 +2,7 @@
   <div>
     <div class="side-nav">
       <el-table :data="treeList" style="width: 100%" v-loading="loading">
-        <el-table-column prop="Type" label="Type">
+        <el-table-column prop="Type" label="Type" width="60">
         </el-table-column>
         <el-table-column prop="Status" label="Status">
         </el-table-column>
@@ -22,10 +22,11 @@
         </el-table-column>
         <el-table-column prop="Comment" label="Comment" >
         </el-table-column>
-        <el-table-column fixed="right" label="Operation">
+        <el-table-column fixed="right" label="Operation" width="150">
           <template slot-scope="scope">
             <el-button @click="getProjectDetails(scope.row)" type="text" size="small">Detail</el-button>
             <el-button @click='editProjectDetails(scope.row)' type="text" size="small">Edit</el-button>
+            <el-button @click='deleteProjectDetails(scope.row)' type="text" size="small">Delete</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -52,15 +53,6 @@
       formData_service.default.getProjects.extc()
         .then(data => {
           this.treeList = data.data;
-          // this.treeList.forEach(element => {
-          //   let tree = { "Type": element.Type, "Status": element.Status, "Country": element.Country, "ProjectNo": element.ProjectNo, "Customer": element.Customer, "ProjectName": element.ProjectName, "CloseDate": element.CloseDate }
-          //   element.ProjectFinancList.forEach(project => {
-          //     let monthTemp = this.MonthMapping(project.Month);
-          //     tree[monthTemp] = project.Revenue;
-          //   });
-          //   this.projectFinance.push(tree);
-          // });
-          // this.projectFinance=
           this.loading = false;
         });
       console.log(this.treeList);
@@ -83,13 +75,6 @@
           case "12": return "Dec";
         }
       },
-
-      handleNodeClick(data) {
-        console.log(data);
-      },
-      handleClick(tab, event) {
-        console.log(tab, event);
-      },
       getProjectDetails(row) {
         this.$router.push({
           name: 'project_detail',
@@ -105,6 +90,12 @@ this.$router.push({
             item: row.ProjectNo
           }
 })
+      },
+      deleteProjectDetails(row){
+        formData_service.default.deleteProjectPerId.exec(_vm.projectId)
+        .then(result=>{
+
+        })
       }
     }
   }

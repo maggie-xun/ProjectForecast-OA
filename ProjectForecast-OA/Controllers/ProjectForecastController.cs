@@ -116,7 +116,7 @@ namespace ProjectForecast_OA.Controllers
                 var userName = AuthenticationManager.User.Claims.ToList()[0].Value; 
                 var password= AuthenticationManager.User.Claims.ToList()[1].Value;
                 var userLogin = context.Consultants.Select(x => x).Where(x => x.Consultant_Name == userName && x.PassWord == password).FirstOrDefault();
-                var projects = context.projects.ToList();
+                var projects = context.projects.Where(x=>x.Status!= "Cancelled").ToList();
                 if (userLogin.Role == "Manager")
                 {
                     projects = (from project in projects
@@ -481,6 +481,19 @@ namespace ProjectForecast_OA.Controllers
                 context.Customers.Remove(customer);
                 context.SaveChanges();
                 return Json(customer, JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        public ActionResult DeleteProject(string id)
+        {
+            using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+            {
+                var project = context.projects.Select(x => x).Where(x => x.ProjectNo == id).FirstOrDefault();
+                project.Status = "Cancelled";
+                DbEntityEntry<Project> entry = context.Entry(project);
+                entry.State = EntityState.Modified;
+                context.SaveChanges();
+                return Json(project, JsonRequestBehavior.AllowGet);
             }
         }
     }

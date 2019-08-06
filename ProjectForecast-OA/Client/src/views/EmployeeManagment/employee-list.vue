@@ -7,7 +7,9 @@
             </el-table-column>
             <el-table-column prop="CostRate" label="CostRate">
             </el-table-column>
-            <el-table-column prop="HireDecision" label="HireDecision">
+            <el-table-column prop="HireDecision" label="Hire Decision">
+            </el-table-column>
+            <el-table-column prop="TimeSchedule" label="Time Schedule">
             </el-table-column>
             <el-table-column fixed="right" label="Operation">
                 <template slot-scope="scope">

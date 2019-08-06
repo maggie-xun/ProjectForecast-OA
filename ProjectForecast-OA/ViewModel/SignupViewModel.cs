@@ -16,10 +16,11 @@ namespace ProjectForecast_OA
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
-        //[Required(ErrorMessage = "必须输入密码！")]
-        //[DataType(DataType.Password)]
-        //[Display(Name = "密码")]
-        //public string ConfirmPassword { get; set; }
+
+        [Required(ErrorMessage = "Password is needed！")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Password Confirmed")]
+        public string ConfirmPassword { get; set; }
 
         [Required(ErrorMessage = "Country is needed！")]
         [Display(Name = "Country")]

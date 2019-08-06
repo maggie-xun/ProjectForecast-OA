@@ -267,6 +267,22 @@ export default {
       });
     }
   },
+  deleteProjectPerId:{
+    url() {
+      return `${host}/ProjectForecast/DeleteProject`;
+    },
+    extc: function(form) {
+      return new Promise((resolve, reject) => {
+        axios.post(this.url(), form)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err);
+          });
+      });
+    }
+  }
 };
 //然后再修改原型链
 // Vue.prototype.$http = axios;

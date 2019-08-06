@@ -24,9 +24,9 @@
         },
 
         mounted() {
+            var _vm=this;
             var myChart = echarts.init(document.getElementById("project_column"));
             this.pie = echarts.init(document.getElementById("monthly_pie"));
-
 
             this.columnxAxis.forEach((ele, index) => {
                 if (this.getProperty(this.utilizationData, 'Month', ele)) {
@@ -37,21 +37,11 @@
                 }
             });
 
-            formData_service.default.getProjectMonthlyUtilization.exec(this.projectNo, this.utilizationData[0].Month)
-                .then(data => {
-                    data.data.forEach(x => {
-                        this.pieData.push({
-                            value: x.WorkDays,
-                            name: x.Name
-                        })
-                    });
-                    console.log(this.pieData)
-                    this.drawPie();
-                });
+            this.drawPie(this.utilizationData[0].Month);
 
             myChart.setOption({
                 title: {
-                    text: ''
+                    text: 'Project No'+this.projectNo
                 },
                 tooltip: {},
                 xAxis: {
@@ -66,7 +56,8 @@
             });
 
             myChart.on('click', 'series', function (params) {
-                console.log("click");
+                console.log(params.name);
+                _vm.drawPie(params.name);
             })
         },
         created() {
@@ -82,17 +73,26 @@
 
             },
 
-            drawPie() {
-                var option = {
+            drawPie(month) {
+                this.pieData=[];
+                formData_service.default.getProjectMonthlyUtilization.exec(this.projectNo, month)
+                .then(data => {
+                    data.data.forEach(x => {
+                        this.pieData.push({
+                            value: x.WorkDays,
+                            name: x.Name
+                        })
+                    });
+                    var option = {
                     // backgroundColor: '#2c343c',
 
                     title: {
-                        text: 'Customized Pie',
+                        text: 'Project No'+this.projectNo,
                         left: 'center',
                         top: 20,
-                        // textStyle: {
-                        //     color: '#ccc'
-                        // }
+                        textStyle: {
+                            color: '#ccc'
+                        }
                     },
 
                     tooltip: {
@@ -110,44 +110,37 @@
                     },
                     series: [
                         {
-                            name: '访问来源',
+                            name: '',
                             type: 'pie',
                             radius: '55%',
                             center: ['50%', '50%'],
                             data: this.pieData.sort(function (a, b) { return (a.value - b.value) ; }),
                             roseType: 'radius',
-                            // label: {
-                            //     normal: {
-                            //         textStyle: {
-                            //             color: 'rgba(255, 255, 255, 0.3)'
-                            //         }
-                            //     }
-                            // },
-                            // labelLine: {
-                            //     normal: {
-                            //         lineStyle: {
-                            //             color: 'rgba(255, 255, 255, 0.3)'
-                            //         },
-                            //         smooth: 0.2,
-                            //         length: 10,
-                            //         length2: 20
-                            //     }
-                            // },
-                            // itemStyle: {
-                            //     normal: {
-                            //         color: '#c23531',
-                            //         shadowBlur: 200,
-                            //         shadowColor: 'rgba(0, 0, 0, 0.5)'
-                            //     }
-                            // },
+                            label: {
+                                normal: {
+                                    textStyle: {
+                                        color: 'rgba(255, 255, 255, 0.3)'
+                                    }
+                                }
+                            },
+                            labelLine: {
+                                normal: {
+                                    lineStyle: {
+                                        color: 'rgba(255, 255, 255, 0.3)'
+                                    },
+                                    smooth: 0.2,
+                                    length: 10,
+                                    length2: 20
+                                }
+                            },
                             itemStyle: {
-                emphasis: {
-                    shadowBlur: 10,
-                    shadowOffsetX: 0,
-                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                }
-            },
-
+                                normal: {
+                                    color: '#c23531',
+                                    shadowBlur: 200,
+                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                }
+                            },
+                           
                             animationType: 'scale',
                             animationEasing: 'elasticOut',
                             animationDelay: function (idx) {
@@ -158,6 +151,8 @@
                 };
 
                 this.pie.setOption(option, true);
+                });
+                
             }
         },
     }
