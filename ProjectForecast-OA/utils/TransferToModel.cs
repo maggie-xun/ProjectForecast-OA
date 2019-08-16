@@ -7,7 +7,7 @@ using System.Web;
 
 namespace ProjectForecast_OA.utils
 {
-    public class TransferToModel
+    public static class TransferToModel
     {
         public static List<T> CreateListFromTable<T>(DataTable tbl) where T : new()
         {
@@ -28,7 +28,8 @@ namespace ProjectForecast_OA.utils
         {
             // create a new object
             T item = new T();
-
+            //set Columns
+            
             // set the item
             SetItemFromRow(item, row);
 
@@ -46,14 +47,53 @@ namespace ProjectForecast_OA.utils
                 //{
                 //    c.ColumnName = c.ColumnName.Trim();
                 //}
+                //System.Reflection.PropertyInfo[] propertys = item.GetType().GetProperties();
+
                 PropertyInfo p = item.GetType().GetProperty(c.ColumnName.Replace(" ", ""));
 
                 // if exists, set the value
+
                 if (p != null && row[c] != DBNull.Value)
                 {
                     p.SetValue(item, row[c], null);
                 }
             }
+            //for(int i = 0; i < row.ItemArray.Length; i++)
+            //{
+            //    DataColumn c = new DataColumn(row.ItemArray[i].ToString());
+            //    PropertyInfo p = item.GetType().GetProperty(c.ColumnName.Replace(" ", ""));
+
+            //    // if exists, set the value
+
+            //    if (p != null && row[c] != DBNull.Value)
+            //    {
+            //        p.SetValue(item, row[c], null);
+            //    }
+            //}
         }
+
+        //public static List<T> ToList<T>(this DataTable table) where T : new()
+        //{
+        //    List<PropertyInfo> properties = typeof(T).GetProperties().ToList();
+        //    List<T> result = new List<T>();
+
+        //    foreach (var row in table.Rows)
+        //    {
+        //        var item = CreateItemFromRow<T>((DataRow)row, properties);
+        //        result.Add(item);
+        //    }
+
+        //    return result;
+        //}
+
+        //private static T CreateItemFromRow<T>(DataRow row, IList<PropertyInfo> properties) where T : new()
+        //{
+        //    T item = new T();
+        //    foreach (var property in properties)
+        //    {
+        //        property.SetValue(item, row[property.Name], null);
+        //    }
+        //    return item;
+        //}
     }
 }

@@ -11,6 +11,10 @@ using System.Data.Entity.Infrastructure;
 using System.Data.Entity;
 using Microsoft.Owin.Security;
 using System.Web;
+using System.IO;
+using StoryDemo.Helpers;
+using NPOI.SS.UserModel;
+using NPOI.HSSF.UserModel;
 
 namespace ProjectForecast_OA.Controllers  
 {
@@ -496,5 +500,48 @@ namespace ProjectForecast_OA.Controllers
                 return Json(project, JsonRequestBehavior.AllowGet);
             }
         }
+
+        public ActionResult ImportFromExcel()
+        {
+            try
+            {
+                string str = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
+                Request.Files[0].SaveAs(str+"\\input.xlsx");
+
+                DataTable dt = ExcelHelper.GetTable(str + "\\input.xlsx","Summery$");
+                //IWorkbook workbook = WorkbookFactory.Create(str + "\\input.xlsx");
+                //ISheet sheet = workbook.GetSheetAt(0);//获取第一个工作薄
+
+
+                //HSSFWorkbook hssfwb;
+                //using (FileStream file = new FileStream(str + "\\input.xlsx", FileMode.Open, FileAccess.Read))
+                //{
+                //    hssfwb = new HSSFWorkbook(file);
+                //}
+
+                //ISheet sheet = workbook.GetSheetAt(0);
+
+                //for (int row = 0; row <= sheet.LastRowNum; row++)
+                //{
+                //    if (sheet.GetRow(row) != null) //null is when the row only contains empty cells 
+                //    {
+
+                //        //MessageBox.Show(string.Format("Row {0} = {1}", row, sheet.GetRow(row).GetCell(0).StringCellValue));
+                //    }
+                //}
+
+                //int[] a = { 0, 10 };
+                //int[] b = { 0, 6 };
+
+                //SplitDataTable.SplitDataTableHelper(dt, a, b);
+                List<Summery> summeries = TransferToModel.CreateListFromTable<Summery>(dt);
+
+            }
+            catch (Exception e)
+            {
+            }
+        
+          return null;
+            }
     }
 }

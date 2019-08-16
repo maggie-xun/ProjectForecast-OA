@@ -227,7 +227,7 @@ export default {
 
   getEmployeeById:{
     url() {
-      return `${host}/ProjectForecast/GetCustomerPerId`;
+      return `${host}/ProjectForecast/GetEmployeePerId`;
     },
     exec: function(projectNo) {
       var _self = this;
@@ -281,6 +281,27 @@ export default {
             reject(err);
           });
       });
+    }
+  },
+
+
+  importFromExcel:{
+    url() { return `${host}/ProjectForecast/ImportFromExcel` },
+    exec: function(files) {
+      var _self = this;
+            var filesForm = new FormData();
+            for (var i= 0; i < files.length; i++) {
+                filesForm.append("Files", files[i]);
+            }
+            return $.ajax({
+                "async": true,
+                "url": _self.url(),
+                "contentType": false,
+                "processData": false,
+                "method": "POST",
+                "mimeType": "multipart/form-data",
+                data: filesForm
+            });
     }
   }
 };

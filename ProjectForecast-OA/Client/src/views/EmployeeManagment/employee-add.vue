@@ -2,7 +2,7 @@
     <div>
         <div class="side-nav">
 
-            <el-form ref="form" :model="form" label-width="120px">
+            <el-form ref="form" :model="form" label-width="130px">
                 <el-form-item label="Consultant Name">
                     <el-input v-model="form.Consultant_Name"></el-input>
                 </el-form-item>

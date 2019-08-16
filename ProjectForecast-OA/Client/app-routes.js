@@ -2,15 +2,18 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 import project_list from "./src/views/Project/project-list";
 import project_add from "./src/views/Project/project-add";
+import project_addFromExcel from "./src/views/Project/project-addFromExcel";
 import employee_list from "./src/views/EmployeeManagment/employee-list";
 import employee_add from "./src/views/EmployeeManagment/employee-add";
 import employee_edit from './src/views/EmployeeManagment/employee-edit'
+import employee_timesheet from './src/views/EmployeeManagment/employee-timesheet'
 import backlog from './src/views/Summary/Backlog';
 import project_detail from './src/views/Project/project-detail'
 import project_edit from './src/views/Project/project-edit'
 import customer_add from './src/views/Customer/customer-add'
 import customer_list from './src/views/Customer/customer-list'
 import customer_edit from './src/views/Customer/customer-edit'
+
 
 Vue.use(VueRouter);
 
@@ -41,6 +44,11 @@ const routes = [
     component: employee_edit
   },
   {
+    name: "employee_timesheet",
+    path: "/employee_timesheett",
+    component: employee_timesheet
+  },
+  {
     name: "backlog",
     path: "/backlog",
     component: backlog
@@ -54,6 +62,11 @@ const routes = [
     name: "project_edit",
     path: "/project_edit",
     component: project_edit
+  },
+  {
+    name: "project_addFromExcel",
+    path: "/project_addFromExcel",
+    component: project_addFromExcel
   },
   {
     name: "customer_add",
@@ -70,6 +83,8 @@ const routes = [
     path: "/customer_edit",
     component: customer_edit
   },
+
+  
 ];
 
 export default new VueRouter({

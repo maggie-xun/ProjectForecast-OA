@@ -210,8 +210,8 @@
 
             formData_service.default.getProjectPerId.exec(this.$route.params.item)
                 .then(data => {
-                    if (data.data.length > 0) {
-                        _vm.detailData = data.data[0];
+                   
+                        _vm.detailData = data.data;
                         _vm.form = _vm.detailData;
                         if (!_vm.form.Country) {
                             _vm.form.Country = { CountryId: '' }
@@ -225,8 +225,6 @@
                         _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
                         _vm.FinancialReport = _vm.detailData.ProjectFinancList;
                         _vm.loading = false;
-                    }
-
                     console.log(_vm.form);
                 });
 
