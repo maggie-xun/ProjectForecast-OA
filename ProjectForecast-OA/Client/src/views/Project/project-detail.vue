@@ -1,10 +1,9 @@
 <template>
         <div>
           <div class="side-nav">
-
-                <el-tabs v-model="activeName" type="border-card" style='line-height: 40px;'>
-                        <el-tab-pane label="Basic Info" name="first" style='line-height: 20px;'>
-                            <el-form ref="form" :model="form" label-width="120px">
+            <el-tabs v-model="activeName" type="border-card" style='line-height: 40px;'>
+                    <el-tab-pane label="Basic Info" name="first" style='line-height: 20px;'>
+                        <el-form ref="form" :model="form" label-width="120px">
                                 <el-form-item label="Country">
                                     <el-input v-model="form.Country.CountryName" :disabled="true"></el-input>
                                 </el-form-item>
@@ -29,13 +28,10 @@
                                 <el-form-item label="CloseDate">
                                         <el-input v-model="form.CloseDate" :disabled="true"></el-input>
                                 </el-form-item>
-                                <el-form-item>
-                                    <el-button type="primary" @click='NextPage'>Add Now</el-button>
-                                </el-form-item>
-                            </el-form>
-                        </el-tab-pane>
-                        <el-tab-pane label="Utilization" name="second">
-                                <el-table border :data="infiledList" style="width: 100%">
+                        </el-form>
+                    </el-tab-pane>
+                    <el-tab-pane label="Utilization" name="second">
+                        <el-table border :data="infiledList" style="width: 100%">
                                         <el-table-column prop="fildna" label="Name" style="width:6vw;">
                                             <template scope="scope">
                                                 <el-input size="mini" v-model="scope.row.Consultant_Name" disabled="disabled">
@@ -57,11 +53,11 @@
                                                         <el-input size="mini" v-model="scope.row.MonthElement[index].WorkingHour" disabled="disabled"></el-input>
                                                     </template>
                                                 </el-table-column>
-                                    </el-table>
-                                    <project_utilization v-bind:utilizationData="totalUtilization" v-bind:projectNo='projectId'></project_utilization>
-                        </el-tab-pane>
-                        <el-tab-pane label="FinancialReport" name="third">
-                            <div class="block">        
+                                </el-table>
+                                <project_utilization v-if="totalUtilization.length>0" v-bind:utilizationData="totalUtilization" v-bind:projectNo='projectId'></project_utilization>
+                    </el-tab-pane>
+                    <el-tab-pane label="FinancialReport" name="third">
+                        <div class="block">        
                                 <el-table border :data="FinancialReport" style="width: 100%">
                                     <el-table-column prop="Month" label="Month" style="width:6vw;">
                                         <template scope="scope">
@@ -109,9 +105,9 @@
                                         </template>
                                     </el-table-column>                                 
                                 </el-table>
-                            </div>
-                        </el-tab-pane>
-                    </el-tabs>
+                        </div>
+                    </el-tab-pane>
+            </el-tabs>
           </div>
         </div>
       </template>
@@ -121,12 +117,12 @@
         var moment = require('moment');
         export default {
             components:{
-                project_utilization
+                project_utilization:()=>import('./utilization_all_column')
             },
           data() {
             return {
               detailData:{ },
-              form: {},
+              form: {Country:{CountryName:""},Consultant:{Consultant_Name:""},Customer:{Customer_name:""}},
               infiledList:[],
               activeName: 'first',
               loading: false,       
@@ -141,7 +137,9 @@
               totalUtilization:[]
             }
           },
-          created() {
+          created() 
+              
+          {
             var _vm=this;
             _vm.loading=true;
             _vm.projectId = this.$route.params.item;
@@ -149,6 +147,9 @@
               .then(data => {
                   _vm.detailData = data.data;
                   _vm.form = _vm.detailData;
+                  if(_vm.form.Consultant==null){
+                      _vm.form.Consultant={ConsultantName:""};
+                  }
                   _vm.totalUtilization=_vm.detailData.TeamUtilization;
                   _vm.timeSpan = [_vm.form.StartDate, _vm.form.CloseDate];
                   // _vm.infiledList=_vm.detailData.Employees;
@@ -167,6 +168,10 @@
                       let MonthElement = [];
                       employee.forEach(monthElement => {
                           let exits = false;
+                          if(_vm.months.length==0){
+                            //   _vm.months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+                            _vm.months=[1,2,3,4,5,6,7,8,9,10,11,12]
+                          }
                           for (let j in _vm.months) {
                               if (_vm.months[j] == _vm.MonthMappingReverse(monthElement.Month)) {
                                   exits = true;
@@ -219,9 +224,6 @@
                     case 12: return "Dec";
                 }
             },
-            NextPage(){
-                this.activeName='second';
-            },
             getProperty(list, property, value) {
                 for (let i in list) {
                     if (list[i][property] == value) {
@@ -257,7 +259,12 @@
                     case "Dec": return 12;
                 }
             },
-           
+            handleClick(tab,event){
+                // _vm.totalUtilization=_vm.detailData.TeamUtilization;
+
+
+               
+            }
           }
         }
       </script>

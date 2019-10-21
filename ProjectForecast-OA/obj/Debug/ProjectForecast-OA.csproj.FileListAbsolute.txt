@@ -235,3 +235,4 @@ D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\bin\NPOI.Open
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\bin\NPOI.OpenXmlFormats.dll
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\bin\ICSharpCode.SharpZipLib.xml
 D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._08163.resources
+D:\xunhainan\project\CRM\ProjectForecase-OA-Git\ProjectForecast-OA\obj\Debug\ProjectForecast_OA.Migrations._1014.resources

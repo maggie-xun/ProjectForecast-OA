@@ -15,20 +15,21 @@ using System.IO;
 using StoryDemo.Helpers;
 using NPOI.SS.UserModel;
 using NPOI.HSSF.UserModel;
+using System.Data.Entity.Validation;
 
-namespace ProjectForecast_OA.Controllers  
+namespace ProjectForecast_OA.Controllers
 {
     public class ProjectForecastController : Controller
     {
         // GET: ProjectForecast
         public ActionResult AddEmployeeInBatch()
         {
-           DataTable dt= ExcelHelper.GetTable(@"D:\xunhainan\project\CRM\2019ChinaProjectForecastTEMPLATE.xlsx","Proj_1$");
-            int[] a ={ 0, 10};
-            int[] b = { 0, 6};
+            DataTable dt = ExcelHelper.GetTable(@"D:\xunhainan\project\CRM\2019ChinaProjectForecastTEMPLATE.xlsx", "Proj_1$");
+            int[] a = { 0, 10 };
+            int[] b = { 0, 6 };
 
-            SplitDataTable.SplitDataTableHelper(dt,a,b);
-           TransferToModel.CreateListFromTable<Summery>(dt);
+            SplitDataTable.SplitDataTableHelper(dt, a, b);
+            TransferToModel.CreateListFromTable<Summery>(dt);
             return null;
         }
         public ActionResult GetAllEmployees()
@@ -59,7 +60,7 @@ namespace ProjectForecast_OA.Controllers
             }
             return null;
         }
-    
+
         public ActionResult AddProject(ProjectViewModel projectViewModel)
         {
             try
@@ -101,43 +102,43 @@ namespace ProjectForecast_OA.Controllers
                             context.ProjectCosts.Add(item);
                         }
                     }
-                   
+
                     context.SaveChanges();
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
 
             }
             return null;
         }
 
-       public ActionResult GetProjects()
+        public ActionResult GetProjects()
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
                 //var user = AccountController.LoginUser;
-                var userName = AuthenticationManager.User.Claims.ToList()[0].Value; 
-                var password= AuthenticationManager.User.Claims.ToList()[1].Value;
+                var userName = AuthenticationManager.User.Claims.ToList()[0].Value;
+                var password = AuthenticationManager.User.Claims.ToList()[1].Value;
                 var userLogin = context.Consultants.Select(x => x).Where(x => x.Consultant_Name == userName && x.PassWord == password).FirstOrDefault();
-                var projects = context.projects.Where(x=>x.Status!= "Cancelled").ToList();
+                var projects = context.projects.Where(x => x.Status != "Cancelled").ToList();
                 if (userLogin.Role == "Manager")
                 {
                     projects = (from project in projects
-                                join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
+                                //join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
                                 select project).ToList();
                 }
-                else if(userLogin.Role == "Consultant")
+                else if (userLogin.Role == "Consultant")
                 {
                     projects = (from project in projects
                                 join consultant in context.Consultants on project.Consultant_ID equals consultant.Consultant_Id
                                 join country in context.Country on consultant.Country equals country.CountryName
-                                where (consultant.Consultant_Id == userLogin.Consultant_Id&& consultant.Role == userLogin.Role && country.CountryName == userLogin.Country)
+                                where (consultant.Consultant_Id == userLogin.Consultant_Id && consultant.Role == userLogin.Role && country.CountryName == userLogin.Country)
                                 select project).ToList();
                 }
 
                 List<ProjectViewModel> projectViewModels = new List<ProjectViewModel>();
-                var projectCost = context.ProjectCosts.GroupBy(x=>x.ProjectNo).ToList();
+                var projectCost = context.ProjectCosts.GroupBy(x => x.ProjectNo).ToList();
                 foreach (var project in projects)
                 {
                     var country = context.Country.Select(x => x).Where(x => x.CountryId == project.CountryId).FirstOrDefault();
@@ -148,8 +149,8 @@ namespace ProjectForecast_OA.Controllers
                     {
                         ProjectNo = project.ProjectNo,
                         ProjectName = project.ProjectName,
-                        Consultant= consultant,
-                        Customer= customer,
+                        Consultant = consultant,
+                        Customer = customer,
                         Country = country,
                         Status = project.Status,
                         Type = project.Type,
@@ -164,7 +165,7 @@ namespace ProjectForecast_OA.Controllers
                         }
                     }
                     projectViewModels.Add(viewModel);
-                }                           
+                }
                 context.SaveChanges();
                 return Json(projectViewModels, JsonRequestBehavior.AllowGet);
             }
@@ -180,19 +181,19 @@ namespace ProjectForecast_OA.Controllers
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
-                var project = context.projects.Where(x=>x.ProjectNo==id).FirstOrDefault();
+                var project = context.projects.Where(x => x.ProjectNo == id).FirstOrDefault();
                 List<ProjectViewModel> projectViewModels = new List<ProjectViewModel>();
                 var projectCost = context.ProjectCosts.GroupBy(x => x.ProjectNo).ToList();
                 var workday_Details = context.Consultant_Workday_Details.ToList();
                 var employees = from employee in workday_Details
                                 where employee.ProjectNo == id
-                               select new Consultant_Workday_Details
+                                select new Consultant_Workday_Details
                                 {
-                                   Id = employee.Id,
-                                   Consultant_Id = employee.Consultant_Id,
-                                    Consultant_Name=employee.Consultant_Name,
-                                    CostRate=employee.CostRate,
-                                    Type=employee.Type,
+                                    Id = employee.Id,
+                                    Consultant_Id = employee.Consultant_Id,
+                                    Consultant_Name = employee.Consultant_Name,
+                                    CostRate = employee.CostRate,
+                                    Type = employee.Type,
                                     Month = employee.Month,
                                     ProjectNo = id,
                                     WorkDays = employee.WorkDays,
@@ -202,44 +203,44 @@ namespace ProjectForecast_OA.Controllers
                 var teamUtilization = from utilization in workday_Details
                                       where utilization.ProjectNo == id
                                       group utilization by utilization.Month
-                                      into s                                    
+                                      into s
                                       select new TeamUtilization
                                       {
-                                          Month= s.Select(x=>x.Month).FirstOrDefault(),
-                                          TotalWorkDays = s.Sum(x=>x.WorkDays)
+                                          Month = s.Select(x => x.Month).FirstOrDefault(),
+                                          TotalWorkDays = s.Sum(x => x.WorkDays)
                                       };
 
                 var country = context.Country.Select(x => x).Where(x => x.CountryId == project.CountryId).FirstOrDefault();
-                    var customer = context.Customers.Select(x => x).Where(x => x.CustomerId == project.Customer_Id).FirstOrDefault();
-                    var consultant = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == project.Consultant_ID).FirstOrDefault();
-                    ProjectViewModel viewModel = new ProjectViewModel()
+                var customer = context.Customers.Select(x => x).Where(x => x.CustomerId == project.Customer_Id).FirstOrDefault();
+                var consultant = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == project.Consultant_ID).FirstOrDefault();
+                ProjectViewModel viewModel = new ProjectViewModel()
+                {
+                    ProjectNo = project.ProjectNo,
+                    ProjectName = project.ProjectName,
+                    Consultant = consultant,
+                    Customer = customer,
+                    Country = country,
+                    Status = project.Status,
+                    Type = project.Type,
+                    CloseDate = project.CloseDate,
+                    StartDate = project.StartDate,
+                    Employees = employees.ToList()
+                };
+                foreach (var item in projectCost)
+                {
+                    if (project.ProjectNo == item.FirstOrDefault().ProjectNo)
                     {
-                        ProjectNo = project.ProjectNo,
-                        ProjectName = project.ProjectName,
-                        Consultant = consultant,
-                        Customer= customer,
-                        Country = country,
-                        Status = project.Status,
-                        Type = project.Type,
-                        CloseDate=project.CloseDate,
-                        StartDate=project.StartDate,
-                        Employees=employees.ToList()
-                    };
-                    foreach (var item in projectCost)
-                    {
-                        if (project.ProjectNo == item.FirstOrDefault().ProjectNo)
-                        {
-                            viewModel.ProjectFinancList = item.ToList();
-                        }
+                        viewModel.ProjectFinancList = item.ToList();
                     }
+                }
                 viewModel.TeamUtilization = teamUtilization.ToList();
-                               
+
                 context.SaveChanges();
                 return Json(viewModel, JsonRequestBehavior.AllowGet);
             }
         }
 
-        public ActionResult GetPersonalUtilization(string projectId,string month)
+        public ActionResult GetPersonalUtilization(string projectId, string month)
         {
 
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
@@ -256,7 +257,7 @@ namespace ProjectForecast_OA.Controllers
                                           };
                 return Json(personalUtilization.ToList(), JsonRequestBehavior.AllowGet);
             }
-           
+
         }
 
         public ActionResult GetAllCountry()
@@ -292,25 +293,25 @@ namespace ProjectForecast_OA.Controllers
                     foreach (var item in projectViewModel.Employees)
                     {
                         var added = false;
-                        for (int i=0; i < workday_Details.Count; i++)
+                        for (int i = 0; i < workday_Details.Count; i++)
                         {
                             if (item.Id == workday_Details[i].Id)
                             {
                                 added = true;
-                                workday_Details[i].WorkDays= item.WorkDays;                                
+                                workday_Details[i].WorkDays = item.WorkDays;
                                 context.Entry(workday_Details[i]).State = EntityState.Modified;
                             }
-                        }                       
+                        }
                         if (!added)
                         {
                             context.Consultant_Workday_Details.Add(item);
-                        }                     
+                        }
                     }
 
                     foreach (var item in projectViewModel.ProjectFinancList)
                     {
                         var added = false;
-                        for(int i=0;i< projectCosts.Count; i++)
+                        for (int i = 0; i < projectCosts.Count; i++)
                         {
                             if (item.Id == projectCosts[i].Id)
                             {
@@ -326,23 +327,24 @@ namespace ProjectForecast_OA.Controllers
                         {
                             context.ProjectCosts.Add(item);
                         }
-                        
+
                     }
 
                     DbEntityEntry<Project> entry = context.Entry(project);
                     entry.State = EntityState.Modified;
                     context.SaveChanges();
                 }
-                
+
             }
-           catch(Exception e)
+            catch (Exception e)
             {
 
             }
             return null;
         }
 
-        public ActionResult AddCountry (Country country){
+        public ActionResult AddCountry(Country country)
+        {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
                 //Country cou = new Country()
@@ -368,7 +370,7 @@ namespace ProjectForecast_OA.Controllers
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
-                var consultant = context.Consultant_Workday_Details.Select(x => x).Where(x=>x.Id==id).FirstOrDefault();
+                var consultant = context.Consultant_Workday_Details.Select(x => x).Where(x => x.Id == id).FirstOrDefault();
                 context.Consultant_Workday_Details.Remove(consultant);
                 context.SaveChanges();
                 return Json(consultant, JsonRequestBehavior.AllowGet);
@@ -431,9 +433,10 @@ namespace ProjectForecast_OA.Controllers
                 {
                     int Id = Convert.ToInt32(id);
                     var employee = context.Consultants.Select(x => x).Where(x => x.Consultant_Id == Id).FirstOrDefault();
-                    return Json(employee,JsonRequestBehavior.AllowGet);
+                    return Json(employee, JsonRequestBehavior.AllowGet);
                 }
-                }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return null;
             }
@@ -450,7 +453,7 @@ namespace ProjectForecast_OA.Controllers
                     return Json(employee, JsonRequestBehavior.AllowGet);
                 }
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 return null;
             }
@@ -463,7 +466,7 @@ namespace ProjectForecast_OA.Controllers
                 using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
                 {
                     var customerExits = context.Customers.Select(x => x).Where(x => x.CustomerId == customer.CustomerId).FirstOrDefault();
-                    customerExits.Customer_name= customer.Customer_name;
+                    customerExits.Customer_name = customer.Customer_name;
                     customerExits.Customer_Contact = customer.Customer_Contact;
                     DbEntityEntry<Customer> entry = context.Entry(customerExits);
                     entry.State = EntityState.Modified;
@@ -501,47 +504,177 @@ namespace ProjectForecast_OA.Controllers
             }
         }
 
-        public ActionResult ImportFromExcel()
+        public ActionResult ImportProjectFromExcel()
         {
             try
             {
                 string str = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase;
-                Request.Files[0].SaveAs(str+"\\input.xlsx");
+                Request.Files[0].SaveAs(str + "\\input.xlsx");
 
-                DataTable dt = ExcelHelper.GetTable(str + "\\input.xlsx","Summery$");
-                //IWorkbook workbook = WorkbookFactory.Create(str + "\\input.xlsx");
-                //ISheet sheet = workbook.GetSheetAt(0);//获取第一个工作薄
+                DataTable dt = ExcelHelper.GetTable(str + "\\input.xlsx", "Proj_1$");
 
+                //获取基本信息
+                int[] row = { 0, 10 };
+                int[] col = { 0, 6 };
+                DataTable dtBasic = SplitDataTable.SplitDataTableHelper(dt, row, col);
+                List<ProjectImport> summeries = TransferToModel.CreateListFromTable<ProjectImport>(dtBasic);
 
-                //HSSFWorkbook hssfwb;
-                //using (FileStream file = new FileStream(str + "\\input.xlsx", FileMode.Open, FileAccess.Read))
-                //{
-                //    hssfwb = new HSSFWorkbook(file);
-                //}
+                //获取finance信息
+                col = new int[] { 7, 21 };
+                DataTable dtFinance = SplitDataTable.SplitDataTableHelper(dt, row, col);
+                List<Project_Financial_Report> financeItems = TransferToModel.CreateFinanceItem(dtFinance, summeries.FirstOrDefault().ProjectNo);
 
-                //ISheet sheet = workbook.GetSheetAt(0);
+                //获取employee_work_detail信息
+                row = new int[] { 18, 56 };
+                col = new int[] { 4, 20 };
+                DataTable dtEmployeesWorkDetails = SplitDataTable.SplitDataTableHelper(dt, row, col);
+                List<Consultant_Workday_Details> employeeWorkingDetailsItems = TransferToModel.CreateEmployeeWorkingDetailsItem(dtEmployeesWorkDetails, summeries.FirstOrDefault().ProjectNo);
 
-                //for (int row = 0; row <= sheet.LastRowNum; row++)
-                //{
-                //    if (sheet.GetRow(row) != null) //null is when the row only contains empty cells 
-                //    {
+                //获取employee_work_detail信息
+                row = new int[] { 19, 56 };
+                col = new int[] { 4, 7 };
+                DataTable dtEmployees = SplitDataTable.SplitDataTableHelper(dt, row, col);
+                List<Consultant> employeeItems = TransferToModel.CreateEmployeeItem(dtEmployees, summeries.FirstOrDefault().ProjectNo);
 
-                //        //MessageBox.Show(string.Format("Row {0} = {1}", row, sheet.GetRow(row).GetCell(0).StringCellValue));
-                //    }
-                //}
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    foreach (var item in summeries)
+                    {
+                        if (item.ProjectNo != null)
+                        {
+                            var project = context.projects.Select(x => x).Where(x => x.ProjectNo == item.ProjectNo).FirstOrDefault();
+                            var countryId = context.Country.Where(x => x.CountryName == item.Country).Select(x => x.CountryId).FirstOrDefault();
+                            var customer_Id = context.Customers.Where(x => x.Customer_name == item.Customer).Select(x => x.CustomerId).FirstOrDefault();
+                            if (project == null)
+                            {
+                                if (countryId == 0)
+                                {
+                                    context.Country.Add(new Country { CountryName = item.Country });
+                                    context.SaveChanges();
+                                }
 
-                //int[] a = { 0, 10 };
-                //int[] b = { 0, 6 };
+                                
+                                if (customer_Id == 0)
+                                {
+                                    context.Customers.Add(new Customer { Customer_name = item.Customer });
+                                    context.SaveChanges();
+                                }
+                                Project projectNew = new Project()
+                                {
+                                    ProjectName = item.ProjectName,
+                                    ProjectNo = item.ProjectNo,
+                                    Status = item.Status,
+                                    Type = item.Type,
+                                    CountryId = context.Country.Where(x => x.CountryName == item.Country).Select(x => x.CountryId).FirstOrDefault(),
+                                    Customer_Id = context.Customers.Where(x => x.Customer_name == item.Customer).Select(x => x.CustomerId).FirstOrDefault()
+                                };
+                                context.projects.Add(projectNew);
+                                context.SaveChanges();
+                            }
+                            else
+                            {
+                                project.ProjectName = item.ProjectName;
+                                project.Status = item.Status;
+                                project.Type = item.Type;
+                                project.CountryId = context.Country.Where(x => x.CountryName == item.Country).Select(x => x.CountryId).FirstOrDefault();
+                                project.Customer_Id = context.Customers.Where(x => x.Customer_name == item.Customer).Select(x => x.CustomerId).FirstOrDefault();
+                                DbEntityEntry<Project> entry = context.Entry(project);
+                                entry.State = EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                        }
+                    }
 
-                //SplitDataTable.SplitDataTableHelper(dt, a, b);
-                List<Summery> summeries = TransferToModel.CreateListFromTable<Summery>(dt);
+                    if (financeItems != null)
+                    {
+                        foreach (var item in financeItems)
+                        {
+                            var financeItem = context.ProjectCosts.Select(x => x).Where(x => x.ProjectNo == item.ProjectNo & x.Month == item.Month).FirstOrDefault();
+                            if (financeItem != null)
+                            {
+                                financeItem.Revenue = item.Revenue;
+                                financeItem.Expenses = item.Expenses;
+                                financeItem.IT = item.IT;
+                                financeItem.Materials = item.Materials;
+                                financeItem.HeadCountCost = item.HeadCountCost;
+                                financeItem.ChargesIn = item.ChargesIn;
+                                financeItem.Contractors = item.Contractors;
+                                DbEntityEntry<Project_Financial_Report> entry = context.Entry(financeItem);
+                                entry.State = EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                            else
+                            {
+                                context.ProjectCosts.Add(item);
+                                context.SaveChanges();
+                            }
+                            
+                        }
+                    }
+
+                    if (employeeWorkingDetailsItems != null)
+                    {
+                        foreach (var item in employeeWorkingDetailsItems)
+                        {
+                            var employeeWorkingDetailItem = context.Consultant_Workday_Details.Select(x => x).Where(x => x.Month == item.Month & x.Consultant_Name == item.Consultant_Name).FirstOrDefault();
+                            var consultantId = context.Consultants.Where(x => x.Consultant_Name == item.Consultant_Name).Select(x => x.Consultant_Id).FirstOrDefault();
+                            if (consultantId == 0)
+                            {
+                                context.Consultants.Add(new Consultant { Consultant_Name = item.Consultant_Name, CostRate = item.CostRate, Type = item.Type });
+                                context.SaveChanges();
+                            }
+                            if (employeeWorkingDetailItem != null)
+                            {                       
+                                employeeWorkingDetailItem.Consultant_Id = context.Consultants.Where(x => x.Consultant_Name == item.Consultant_Name).Select(x => x.Consultant_Id).FirstOrDefault();
+                                employeeWorkingDetailItem.WorkDays = item.WorkDays;
+                                DbEntityEntry<Consultant_Workday_Details> entry = context.Entry(employeeWorkingDetailItem);
+                                entry.State = EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                            else
+                            {
+                                item.Consultant_Id = context.Consultants.Where(x => x.Consultant_Name == item.Consultant_Name).Select(x => x.Consultant_Id).FirstOrDefault();
+                                context.Consultant_Workday_Details.Add(item);
+                                context.SaveChanges();
+                            }
+
+                        }
+                    }
+                    if (employeeItems != null)
+                    {
+                        foreach (var item in employeeItems)
+                        {
+                            var consultant = context.Consultants.Select(x => x).Where(x => x.Consultant_Name == item.Consultant_Name).FirstOrDefault();
+                            if (consultant != null)
+                            {
+                  
+                                consultant.CostRate = item.CostRate;
+                                consultant.Type = item.Type;
+                                DbEntityEntry<Consultant> entry = context.Entry(consultant);
+                                entry.State = EntityState.Modified;
+                                context.SaveChanges();
+                            }
+                            else
+                            {
+                                context.Consultants.Add(item);
+                                context.SaveChanges();
+                            }
+                        }
+                    }
+                    context.SaveChanges();
+
+                }
 
             }
-            catch (Exception e)
+            catch (DbEntityValidationException e)
             {
+    //            var errorMessages =
+    //e.EntityValidationErrors
+    //    .SelectMany(validationResult => validationResult.ValidationErrors)
+    //    .Select(m => m.ErrorMessage);
             }
-        
-          return null;
-            }
+
+            return null;
+        }
     }
 }

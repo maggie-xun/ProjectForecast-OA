@@ -20,10 +20,11 @@ namespace ProjectForecast_OA.utils
             for (int i = rowsNum[0]; i < rowsNum[1]; i++)
             {
                 DataRow dr = newDT.NewRow();
+                var colNew = 0;
                 for (int j = columnNum[0]; j < columnNum[1]; j++)
                 {                 
-                    dr[j] = originalTab.Rows[i][j];
-
+                    dr[colNew] = originalTab.Rows[i][j];
+                    colNew++;
                 }
                 newDT.Rows.Add(dr);
             }

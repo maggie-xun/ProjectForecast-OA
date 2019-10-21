@@ -299,6 +299,10 @@
     <Compile Include="Migrations\201908161003171_0816-3.Designer.cs">
       <DependentUpon>201908161003171_0816-3.cs</DependentUpon>
     </Compile>
+    <Compile Include="Migrations\201910140233206_1014.cs" />
+    <Compile Include="Migrations\201910140233206_1014.Designer.cs">
+      <DependentUpon>201910140233206_1014.cs</DependentUpon>
+    </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\Consultant_CostRate.cs" />
     <Compile Include="Models\Consultant_Schedule.cs" />
@@ -308,6 +312,7 @@
     <Compile Include="Models\EFCodeFirstDbContext.cs" />
     <Compile Include="Models\Consultant.cs" />
     <Compile Include="Models\FinanceElement.cs" />
+    <Compile Include="Models\ProjectImport.cs" />
     <Compile Include="ViewModel\ConnectionMapping.cs" />
     <Compile Include="ViewModel\LoginViewModel.cs" />
     <Compile Include="Models\Project.cs" />
@@ -18465,6 +18470,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\201908161003171_0816-3.resx">
       <DependentUpon>201908161003171_0816-3.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201910140233206_1014.resx">
+      <DependentUpon>201910140233206_1014.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>

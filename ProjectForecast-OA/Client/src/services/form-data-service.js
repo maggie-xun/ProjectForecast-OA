@@ -286,7 +286,7 @@ export default {
 
 
   importFromExcel:{
-    url() { return `${host}/ProjectForecast/ImportFromExcel` },
+    url() { return `${host}/ProjectForecast/ImportProjectFromExcel` },
     exec: function(files) {
       var _self = this;
             var filesForm = new FormData();
