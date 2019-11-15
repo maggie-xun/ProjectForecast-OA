@@ -13,6 +13,9 @@ import project_edit from './src/views/Project/project-edit'
 import customer_add from './src/views/Customer/customer-add'
 import customer_list from './src/views/Customer/customer-list'
 import customer_edit from './src/views/Customer/customer-edit'
+import summary from './src/views/Summary/Summary'
+import ltf from './src/views/Summary/ltf'
+import crm from './src/views/Summary/crm'
 
 
 Vue.use(VueRouter);
@@ -54,6 +57,21 @@ const routes = [
     component: backlog
   },
   {
+    name: "summary",
+    path: "/summary",
+    component: summary
+  },
+  {
+    name: "crm",
+    path: "/crm",
+    component: crm
+  },
+  {
+    name: "ltf",
+    path: "/ltf",
+    component: ltf
+  },
+  {
     name: "project_detail",
     path: "/project_detail",
     component: project_detail
@@ -76,7 +94,10 @@ const routes = [
   {
     name: "customer_list",
     path: "/customer_list",
-    component: customer_list
+    component: customer_list,
+    meta: {
+      keepAlive: false // 不需要被缓存
+    }
   },
   {
     name: "customer_edit",

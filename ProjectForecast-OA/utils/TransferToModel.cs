@@ -44,19 +44,26 @@ namespace ProjectForecast_OA.utils
             foreach (DataColumn c in row.Table.Columns)
             {
                 // find the property for the column
-                //if(c.ColumnName.Split(' ').Length>1)
+                //if (c.ColumnName.Split(' ').Length > 1)
                 //{
                 //    c.ColumnName = c.ColumnName.Trim();
                 //}
                 //System.Reflection.PropertyInfo[] propertys = item.GetType().GetProperties();
 
-                PropertyInfo p = item.GetType().GetProperty(c.ColumnName.Replace(" ", ""));
-
-                // if exists, set the value
-
-                if (p != null && row[c] != DBNull.Value)
+                try
                 {
-                    p.SetValue(item, row[c], null);
+                    PropertyInfo p = item.GetType().GetProperty(c.ColumnName.Replace(" ", "").Replace("#", "").Split('/').FirstOrDefault());
+
+                    // if exists, set the value
+
+                    if (p != null && row[c] != DBNull.Value)
+                    {
+                        p.SetValue(item, row[c], null);
+                    }
+                }
+                catch(Exception e)
+                {
+                    
                 }
             }
             //for(int i = 0; i < row.ItemArray.Length; i++)
@@ -167,6 +174,7 @@ namespace ProjectForecast_OA.utils
                 {
                     Consultant consultant = new Consultant();
                     consultant.Type = row[1].ToString();
+                    consultant.HireDecision = true;
                     consultant.Consultant_Name = row[0].ToString();
                     consultant.CostRate =int.Parse(row[2].ToString());
                     lst.Add(consultant);

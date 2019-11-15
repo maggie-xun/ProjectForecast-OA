@@ -3,7 +3,7 @@
         <input id='input-file' style="display:inline-block;width:50%" type="file" @change="upload()" />
         <button @click="submit">导入文件</button>
         <el-button type="primary" @click="submit" style="float:right">导入文件</el-button>
-<project_list></project_list>
+        <project_list></project_list>
     </div>
 </template>
 <script>
@@ -33,7 +33,7 @@
                
                 var filePath=document.getElementById('input-file').value;
 
-                formData_service.default.importFromExcel.exec(_vm.fileList)
+                formData_service.default.importFromExcel.exec(_vm.fileList,"ImportProjectFromExcel")
                     .done(function (read_response) {
                         // read_response = JSON.parse(read_response);
                         // read_response.forEach(story => {

@@ -6,9 +6,8 @@ export default {
       return `${host}/ProjectForecast/AddProject`;
     },
     extc: function(form) {
-      axios.post(this.url(), form).then(data => {
-        console.log(data);
-      });
+
+      return axios.post(this.url(), form)
     }
   },
   getProjects: {
@@ -101,9 +100,18 @@ export default {
     url() {
       return `${host}/ProjectForecast/AddProject`;
     },
-    extc: function(form) {
-      axios.post(this.url(), form).then(data => {
-        console.log(data);
+
+    extc:function(form){
+      var _self = this;
+
+      return new Promise((resolve, reject) => {
+        axios.post(this.url(), form)
+          .then(res => {
+            resolve(res);
+          })
+          .catch(err => {
+            reject(err);
+          });
       });
     }
   },
@@ -194,6 +202,7 @@ export default {
       });
     }
   },
+
   getEmployeeById:{
     url() {
       return `${host}/ProjectForecast/GetEmployeePerId`;
@@ -239,6 +248,21 @@ export default {
       });
     }
   },
+
+  getCustomerById:{
+    url() {
+      return `${host}/ProjectForecast/GetCustomerPerId`;
+    },
+    exec: function(projectNo) {
+      var _self = this;
+
+      return axios.get(this.url(), {
+        params: {
+          id: projectNo
+        }
+      });
+    }
+  },
   deleteCustomer:{
     url() {
       return `${host}/ProjectForecast/DeleteCustomer`;
@@ -271,10 +295,13 @@ export default {
     url() {
       return `${host}/ProjectForecast/DeleteProject`;
     },
-    extc: function(form) {
+    exec: function(id) {
       return new Promise((resolve, reject) => {
-        axios.post(this.url(), form)
-          .then(res => {
+        axios.post(this.url(),{
+
+            id:id
+ 
+        }).then(res => {
             resolve(res);
           })
           .catch(err => {
@@ -287,23 +314,64 @@ export default {
 
   importFromExcel:{
     url() { return `${host}/ProjectForecast/ImportProjectFromExcel` },
-    exec: function(files) {
+    exec: function(files,action) {
+
       var _self = this;
-            var filesForm = new FormData();
-            for (var i= 0; i < files.length; i++) {
-                filesForm.append("Files", files[i]);
-            }
-            return $.ajax({
+      var url=`${host}/ProjectForecast/`+action
+      var filesForm = new FormData();
+      for (var i= 0; i < files.length; i++) {
+         filesForm.append("Files", files[i]);
+      }
+      return $.ajax({
                 "async": true,
-                "url": _self.url(),
+                "url":url,
                 "contentType": false,
                 "processData": false,
                 "method": "POST",
                 "mimeType": "multipart/form-data",
                 data: filesForm
-            });
+      });
     }
+  },
+
+  getCRMs:{
+    url() {
+      return `${host}/ProjectForecast/GetCRMs`;
+    },
+    extc: function() {
+      return axios.get(this.url());
+      //   .then((data)=>{
+      //       return data.data;
+      //   })
+    }
+  },
+
+  getProjectFinance:{
+    url() {
+      return `${host}/ProjectForecast/GetProjectBasicInfo`;
+    },
+    exec: function(projectNo) {
+
+      return axios.get(this.url(), {
+        params: {
+          projectNo: projectNo
+        }
+      });
+    
+    }
+},
+
+
+addProjectFinance: {
+  url() {
+    return `${host}/ProjectForecast/AddProjectFinance`;
+  },
+  extc: function(list) {
+   return axios.post(this.url(), list).then(data => {
+      console.log(data);
+    });
   }
+},
 };
 //然后再修改原型链
 // Vue.prototype.$http = axios;

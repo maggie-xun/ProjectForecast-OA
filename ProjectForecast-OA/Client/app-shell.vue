@@ -20,7 +20,7 @@
                         </el-menu-item>
                     </el-submenu>
                     <el-submenu index="employee_add">
-                        <template slot="title">Empoyee Managment</template>
+                        <template slot="title">Consultant</template>
                         <el-menu-item index="employee_add">
                             <router-link to="/employee_add">Add Empoyee</router-link>
                         </el-menu-item>      
@@ -32,7 +32,7 @@
                         <router-link to="/employee_timesheet">Time Sheet</router-link>                      
                     </el-menu-item>
                     <el-submenu index='customer_add'>
-                        <template slot="title">Customer Managment</template>
+                        <template slot="title">Customer</template>
                         <el-menu-item index='customer_add'>
                             <router-link to="/customer_add">Add Customer</router-link>
                         </el-menu-item>
@@ -40,10 +40,18 @@
                             <router-link to="/customer_list">Customer List</router-link>
                         </el-menu-item>
                     </el-submenu>
-                    <el-menu-item>
+                    <el-menu-item index="summary">
+                        <router-link to="/summary">Summary</router-link>
+                    </el-menu-item>
+                    <el-menu-item index="backlog">
                         <router-link to="/backlog">Backlog</router-link>
                     </el-menu-item>
-                    <el-menu-item index="3" disabled>CRM</el-menu-item>
+                    <el-menu-item index="crm">
+                        <router-link to="/crm">CRM</router-link>
+                    </el-menu-item>
+                    <el-menu-item index="ltf">
+                        <router-link to="/ltf">LTF</router-link>
+                    </el-menu-item>
                     <el-menu-item index="4"><a href="https://www.ele.me" target="_blank">Overview</a></el-menu-item>
                     <el-menu-item index="5"><a href="https://www.ele.me" target="_blank">SAP LTF</a></el-menu-item>
                     <el-menu-item index="6" style="float: right"><a href="/Account/LogOff">Log Out</a></el-menu-item>
@@ -66,7 +74,7 @@
         data: function () {
             return {
                 "activeName": 'first',
-                activeIndex2: 'project_list'
+                activeIndex2: 'project_list',
             }
         },
         created() {

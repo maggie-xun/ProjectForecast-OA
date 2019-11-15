@@ -18,7 +18,7 @@ namespace ProjectForecast_OA.Models
         public string Role { get; set; }
         public int CostRate { get; set; }
         public List<Consultant_CostRate> CostRates { get; set; }
-        public string HireDecision { get; set; }
+        public bool HireDecision { get; set; }
 
     }
 }

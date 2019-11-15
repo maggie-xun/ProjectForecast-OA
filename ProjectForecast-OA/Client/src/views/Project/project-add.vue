@@ -13,7 +13,7 @@
                         <el-option :label="country.CountryName" :value="country.CountryId" v-for='country in Country'>
                         </el-option>
                     </el-select>
-                    <el-button type="text" @click="open">Add Country</el-button>
+                    <el-button type="text" @click="addCountry">Add Country</el-button>
                 </el-form-item>
                 <el-form-item label="Project Number">
                     <el-input v-model="form.ProjectNo"></el-input>
@@ -72,11 +72,11 @@
                             </el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="Month" label="Month" style="width:6vw;">
+                    <!-- <el-table-column prop="Month" label="Month" style="width:6vw;">
                         <template scope="scope">
                             <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
                         </template>
-                    </el-table-column>
+                    </el-table-column> -->
                     <el-table-column prop="Type" label="Type">
                         <template scope="scope">
                             <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
@@ -87,11 +87,16 @@
                             <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="WorkDays" label="WorkDays">
+                    <el-table-column prop="item" :label="item" v-for="(item,i) in columnShow">
+                        <template scope="scope">
+                            <el-input size="mini" v-model="scope.row.WorkingMonth[item]"></el-input>
+                        </template>
+                    </el-table-column>
+                    <!-- <el-table-column prop="WorkDays" label="WorkDays">
                         <template scope="scope">
                             <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
                         </template>
-                    </el-table-column>
+                    </el-table-column> -->
                     <el-table-column fixed="right" label="Operation">
                         <template slot-scope="scope">
                             <el-button @click.native.prevent="deleteRow(scope.$index, infiledList,scope.row.Id)"
@@ -100,6 +105,8 @@
                         </template>
                     </el-table-column>
                 </el-table>
+
+                <el-button style="margin-top: 12px;" @click="SaveEmployeeUtilization">Save and Next</el-button>
             </div>
 
             <div class="block" v-show="active==2">
@@ -112,17 +119,17 @@
                     </el-table-column>
                     <el-table-column prop="HeadCountCost" label="HeadCountCost" style="width:6vw;">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.HeadCountCost"></el-input>
+                            <el-input size="mini" v-model="scope.row.HeadCountCost" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="ChargesIn" label="ChargesIn" style="width:6vw;">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.ChargesIn"></el-input>
+                            <el-input size="mini" v-model="scope.row.ChargesIn" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="Contractors" label="Contractors" style="width:6vw;">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.Contractors"></el-input>
+                            <el-input size="mini" v-model="scope.row.Contractors" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="GP" label="GP" style="width:6vw;">
@@ -189,7 +196,8 @@
                 endMonth: '',
                 sumList: [],
                 active:0,
-                word:'Next'
+                word:'Next',
+                columnShow:[]
             }
         },
         created() {
@@ -231,15 +239,13 @@
             deleteRow(index, rows) {//删除改行
                 rows.splice(index, 1);
             },
-            open() {
+            addCountry() {
                 this.$prompt('Please input the country name', '', {
                     confirmButtonText: 'Add',
                     cancelButtonText: 'Cancle',
                 }).then(({ value }) => {
-                    formData_service.default.addCountry.extc({ CountryName: value })
-                }).then((data) => {
-                    this.Country.push("");
-
+                    formData_service.default.addCountry.extc({ CountryName: value });
+                    this.Country.push(value);
                 }).catch((err) => {
                     console.log(err);
                     this.$message({
@@ -253,54 +259,34 @@
                 var _vm = this;
                 _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                 _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
-                let warning = false;
-                for (let i = _vm.startMonth; i < _vm.endMonth + 1; i++) {
-                    let exits = false;
-                    _vm.FinancialReport.forEach(item => {
-                        if (item.Month == _vm.MonthMapping(i)) {
-                            warning = true;
-                            exits = true;
-                        }
-                    })
-                    if (!exits) {
-                        this.FinancialReport.push({ Month: _vm.MonthMapping(i) });
-                    }
-                    if (warning) {
-                        this.$message({
-                            message: 'The Month is already exits, please try another one',
-                            type: 'warning'
-                        });
-                    }
-                }
             },
+            
             addEmployee() {
                 var _vm = this;
 
-                for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
-                    this.checkList.forEach(element => {
-                        let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
-                        let exists = false;
-                        _vm.infiledList.forEach(utilization => {
-                            if (utilization.Consultant_Name == element && utilization.Month == _vm.MonthMapping(i)) {
-                                exists = true;
-                                warning = true;
-                            }
-                        })
-                        if (!exists) {
-                            this.infiledList.push({
-                                Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type, CostRate: consultant.CostRate, Month: _vm.MonthMapping(i)
-                            })
-                        }
-                    });
-                }
+                this.checkList.forEach(element => {
+                    let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
+                    let workdays={};
+                    let exists = false;
+                    for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                        let month=_vm.MonthMapping(i);
+                        workdays[month]=0;                                            
+                    }
 
-                if (warning) {
-                    console.log('已存在');
-                    this.$message({
-                        message: 'The item is already exits, please try another one',
-                        type: 'warning'
-                    });
-                }
+                    _vm.infiledList.forEach(utilization => {
+                            if (utilization.Consultant_Name == element) {
+                                exists = true;
+                            }
+                        })  
+
+                    if(!exists){
+                        this.infiledList.push({
+                                Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type, 
+                                CostRate: consultant.CostRate,WorkingMonth:{...workdays}
+                            })
+                    }
+
+                });
             },
             getProperty(list, property, value) {
                 for (let i in list) {
@@ -309,59 +295,7 @@
                     }
                 }
             },
-            sum(list) {
-                var _vm = this;
 
-                let groupList = _vm.groupBy(list, function (item) {
-                    return [item.Month];
-                });
-                groupList.forEach(item => {
-                    let HeadCountCost = 0;
-                    let ChargesIn = 0;
-                    let Contractors = 0;
-                    let typeGroups = _vm.groupBy(item, function (innerItem) {
-                        return [innerItem.Type];
-                    })
-                    typeGroups.forEach(typeItem => {
-                        if (typeItem[0].Type == 'HC') {
-                            if (typeItem.length > 1) {
-                                HeadCountCost = typeItem.reduce(function (prev, curr, idx, arr) {
-
-                                    return (parseInt(prev.CostRate) * parseInt(prev.WorkDays) + parseInt(curr.CostRate) * parseInt(curr.WorkDays)) * 8;
-                                })
-                            }
-                            else if (typeItem.length = 1) {
-                                HeadCountCost = (parseInt(typeItem[0].CostRate) * parseInt(typeItem[0].WorkDays)) * 8;
-                            }
-                        }
-                        else if (typeItem[0].Type == 'EX') {
-                            if (typeItem.length > 1) {
-                                ChargesIn = typeItem.reduce(function (prev, curr, idx, arr) {
-                                    return (parseInt(prev.CostRate) * parseInt(prev.WorkDays) + parseInt(curr.CostRate) * parseInt(curr.WorkDays)) * 8;
-                                })
-                            } else {
-                                ChargesIn = (parseInt(typeItem[0].CostRate) * parseInt(typeItem[0].WorkDays)) * 8;
-                            }
-
-                        }
-                        else if (typeItem[0].Type == 'CO') {
-                            if (typeItem.length > 1) {
-                                Contractors = typeItem.reduce(function (prev, curr, idx, arr) {
-                                    return (parseInt(prev.CostRate) * parseInt(prev.WorkDays) + parseInt(curr.CostRate) * parseInt(curr.WorkDays)) * 8;
-                                })
-                            }
-                            else {
-                                Contractors = (parseInt(typeItem[0].CostRate) * parseInt(typeItem[0].WorkDays)) * 8;
-                            }
-
-                        }
-                    })
-
-                    _vm.sumList.push({ Month: item[0].Month, HeadCountCost: HeadCountCost, ChargesIn: ChargesIn, Contractors: Contractors });
-                });
-
-                console.log(groupList);
-            },
             groupBy(array, f) {
                 let groups = {};
                 array.forEach(function (o) {
@@ -378,26 +312,19 @@
                 var _vm = this;
                 if (this.active <= 2) 
                 {
-                    if (this.active == 1) {
-                    _vm.sum(_vm.infiledList);
-                    _vm.word='Save';
-                }
+                    if (_vm.active == 0) {
+                        for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                            let month = _vm.MonthMapping(i);
+                            _vm.columnShow.push(month);
+                        }
+                    }
+
                 if (this.active == 2) {
 
                     let project = this.form;
                     project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
                     project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
 
-                    _vm.startMonth = parseInt(project.CloseDate.split('-')[0]);
-                    _vm.endMonth = parseInt(project.StartDate.split('-')[0]);
-
-                    project.Employees = _vm.infiledList;
-
-                    for (let j in project.Employees) {
-                        if (!project.Employees[j].Id) {
-                            project.Employees[j].ProjectNo = _vm.form.ProjectNo;
-                        }
-                    }
                     project.ProjectFinancList = _vm.sumList;
                     for (let j in project.ProjectFinancList) {
                         //已存在，编辑
@@ -406,13 +333,40 @@
                         }
                     }
 
-                    formData_service.default.addProject.extc(project)
+                    formData_service.default.addProjectFinance.extc(_vm.sumList)
                 }
                 this.active++;
-                }
-               
+                }               
+            },
 
-                
+            SaveEmployeeUtilization(){
+                var _vm = this;
+              
+                let project = _vm.form;
+                project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
+                project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
+                project.Employees = _vm.infiledList;
+
+                // _vm.sum(_vm.infiledList);
+                formData_service.default.addProject.extc(project).then(function (res) {
+                    if (res.data != "") {
+                        formData_service.default.getProjectFinance.exec(project.ProjectNo)
+                            .then(data => {
+                                console.log(data);
+
+                                _vm.sumList = data.data;
+                                _vm.active = 2;
+                            })
+                    }
+                    else {
+                        this.$message('The Project is already exists');
+                        this.$router.push({
+                            name: 'project_add',
+                        })
+                    }
+                }).catch(err => {
+                    this.$message(err.status);
+                })
             }
         }
     }

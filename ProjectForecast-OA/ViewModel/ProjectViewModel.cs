@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ProjectForecast_OA.ViewModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -16,7 +17,7 @@ namespace ProjectForecast_OA.Models
         public string Status { get; set; }
         public string StartDate { get; set; }
         public string CloseDate { get; set; }
-        public List<Consultant_Workday_Details> Employees{ get; set;}
+        public List<WorkingUtilizationViewModel> Employees { get; set;}
         public List<Project_Financial_Report> ProjectFinancList { get; set; }
         public List<TeamUtilization> TeamUtilization { get; set; }
     }

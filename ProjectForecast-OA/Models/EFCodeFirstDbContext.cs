@@ -22,8 +22,15 @@ namespace ProjectForecast_OA.Models
         public DbSet<Consultant_Workday_Details> Consultant_Workday_Details { get; set; }
         public DbSet<Project_Financial_Report> ProjectCosts { get; set; }
         public DbSet<Country> Country { get; set; }
+        public DbSet<CRM> CRMS { get; set; }
+        //protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        //{
+        //    modelBuilder.Entity<Project>().HasKey(t => new { t.CustomerId });
+        //    modelBuilder.Entity<Project>().Property(s => s.CustomerId).HasDatabaseGeneratedOption(System.ComponentModel.DataAnnotations.Schema.DatabaseGeneratedOption.Identity);
+        //}
     }
 
+    
     public class DatabaseInitializer : DropCreateDatabaseIfModelChanges<EFCodeFirstDbContext>
     {
         //protected override void Seed(EFCodeFirstDbContext context)

@@ -42,6 +42,9 @@
                     formData_service.default.addCustomer.extc(this.form)
                     .then(()=>{
                         this.$message('Add Successful!');
+                        this.$router.push({
+                                      name: 'customer_list',
+                                  })
                     })
                 }
             }

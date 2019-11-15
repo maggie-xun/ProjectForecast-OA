@@ -90,24 +90,31 @@
                         text: 'Project No'+this.projectNo,
                         left: 'center',
                         top: 20,
-                        textStyle: {
-                            color: '#ccc'
-                        }
-                    },
 
+                    },
+                        // legend: {
+                        //     type: 'scroll',
+                        //     orient: 'vertical',
+                        //     right: 10,
+                        //     top: 20,
+                        //     bottom: 20,
+                        //     data: data.legendData,
+
+                        //     selected: data.selected
+                        // },
                     tooltip: {
                         trigger: 'item',
                         formatter: "{a} <br/>{b} : {c} ({d}%)"
                     },
 
-                    visualMap: {
-                        show: false,
-                        min: 80,
-                        max: 600,
-                        inRange: {
-                            colorLightness: [0, 1]
-                        }
-                    },
+                    // visualMap: {
+                    //     show: false,
+                    //     min: 80,
+                    //     max: 600,
+                    //     inRange: {
+                    //         colorLightness: [0, 1]
+                    //     }
+                    // },
                     series: [
                         {
                             name: '',
@@ -134,11 +141,16 @@
                                 }
                             },
                             itemStyle: {
-                                normal: {
-                                    color: '#c23531',
-                                    shadowBlur: 200,
-                                    shadowColor: 'rgba(0, 0, 0, 0.5)'
-                                }
+                                // normal: {
+                                //     color: '#c23531',
+                                //     shadowBlur: 200,
+                                //     shadowColor: 'rgba(0, 0, 0, 0.5)'
+                                // }
+                                emphasis: {
+                    shadowBlur: 10,
+                    shadowOffsetX: 0,
+                    shadowColor: 'rgba(0, 0, 0, 0.5)'
+                }
                             },
                            
                             animationType: 'scale',

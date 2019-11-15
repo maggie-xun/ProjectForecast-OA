@@ -27,7 +27,7 @@
         },
         created() {
             var _vm = this;
-            formData_service.default.getEmployeeById.exec(this.$route.params.item).then(data => {
+            formData_service.default.getCustomerById.exec(this.$route.params.item).then(data => {
                 _vm.form = data.data;
             })
         },
@@ -35,7 +35,7 @@
             onSubmitCustomer() {
                 formData_service.default.editCustomer.extc(this.form)
                     .then(() => {
-                        this.$message('Add Successful!');
+                        this.$message('Edit Successful!');
                         this.$router.push({
                           name: 'customer_list',
                       })

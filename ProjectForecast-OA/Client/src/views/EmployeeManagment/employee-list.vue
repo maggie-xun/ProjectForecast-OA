@@ -47,10 +47,29 @@
                     this.loading = false;
                 });
         },
-        methods: {
+        methods: {       
             deleteEmployee(index, rows, rowId) {
-                rows.splice(index, 1);
-                formData_service.default.deleteEmployee.exec(rowId);
+                this.$confirm('Do you want to delete this consultant, this may delete the relation project?', '', {
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No',
+                    type: 'warning'
+                }).then(() => {
+                    
+                    formData_service.default.deleteEmployee.exec(rowId).then(data => {
+                        rows.splice(index, 1);
+                        // this.customerList.forEach((element,index) => {
+                        //               if(element.CustomerId==rowId){
+                        //                 this.customerList.splice(index,1);
+                        //               }
+                        //             });   
+                    });
+
+                }).catch(() => {
+                    this.$message({
+                        type: 'info',
+                        message: 'delete cancled'
+                    });
+                })
             },
             EditEmployee(rowId) {
                 this.$router.push({

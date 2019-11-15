@@ -84,18 +84,25 @@
         })
       },
       editProjectDetails(row) {
-this.$router.push({
-  name: 'project_edit',
+        this.$router.push({
+          name: 'project_edit',
           params: {
             item: row.ProjectNo
           }
-})
-      },
-      deleteProjectDetails(row){
-        formData_service.default.deleteProjectPerId.exec(_vm.projectId)
-        .then(result=>{
-
         })
+      },
+      deleteProjectDetails(row) {
+        this.$confirm('Do you want to delete this project', '', {
+          confirmButtonText: 'Yes',
+          cancelButtonText: 'No',
+          type: 'warning'
+        }).then(() => {
+          formData_service.default.deleteProjectPerId.exec(row.ProjectNo)
+            .then(() => {
+              window.location.reload();
+            })
+        })
+
       }
     }
   }

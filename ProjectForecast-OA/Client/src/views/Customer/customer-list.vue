@@ -10,7 +10,7 @@
                         <el-button @click.native.prevent="editCustomer(scope.row.CustomerId)"
                             size="small"> Edit
                         </el-button>
-                        <el-button @click.native.prevent="deleteCustomer(scope.$index, employeeList,scope.row.CustomerId)"
+                        <el-button @click.native.prevent="deleteCustomer(scope.$index, customerList,scope.row.CustomerId)"
                             size="small"> Remove
                         </el-button>
                     </template>
@@ -42,9 +42,23 @@
                     });     
               },
               methods: {  
-                deleteCustomer(index, rows, rowId) {
-                      rows.splice(index, 1);
-                      formData_service.default.deleteCustomer.exec(rowId);
+                  deleteCustomer(index, rows, rowId) {
+                      this.$confirm('Do you want to delete this customer,this may delete the relation project?', '', {
+                          confirmButtonText: 'Yes',
+                          cancelButtonText: 'No',
+                          type: 'warning'
+                      }).then(() => {
+                          formData_service.default.deleteCustomer.exec(rowId)
+                              .then(()=>{
+                                rows.splice(index, 1);
+                                // this.customerList.forEach((element,index) => {
+                                //       if(element.CustomerId==rowId){
+                                //         this.customerList.splice(index,1);
+                                //       }
+                                //     });                                  
+                              });
+                      })
+
                   },
                   editCustomer(rowId) {
                       this.$router.push({
