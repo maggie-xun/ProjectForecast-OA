@@ -372,6 +372,17 @@ addProjectFinance: {
     });
   }
 },
+
+editProjectFinance:{
+  url() {
+    return `${host}/ProjectForecast/EditProjectFinance`;
+  },
+  extc: function(list) {
+   return axios.post(this.url(), list).then(data => {
+      console.log(data);
+    });
+  }
+}
 };
 //然后再修改原型链
 // Vue.prototype.$http = axios;

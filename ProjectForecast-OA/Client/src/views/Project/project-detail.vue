@@ -198,11 +198,11 @@
                 .then(data => {
                     _vm.detailData = data.data;
                     _vm.form = _vm.detailData;
-                    if (_vm.form.Consultant == null) {
+                    if (_vm.form.Country == null) {
                         _vm.form.Country = { CountryName: "" };
                     }
-                    if(_vm.form.Country == null){
-                        _vm.form.Country = { CountryName: "" };
+                    if(_vm.form.Consultant == null){
+                        _vm.form.Consultant = { Consultant_Name: "" };
                     }
                     if(_vm.form.Customer == null){
                         _vm.form.Customer = { Customer_name: "" };

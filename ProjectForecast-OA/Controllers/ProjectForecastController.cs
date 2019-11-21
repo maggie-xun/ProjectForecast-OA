@@ -96,11 +96,11 @@ namespace ProjectForecast_OA.Controllers
                                 financeItem.Revenue = item.Revenue;
                                 financeItem.Materials = item.Materials;
                                 financeItem.HeadCountCost = item.HeadCountCost;
-                                financeItem.GP = item.GP;
                                 financeItem.Expenses = item.Expenses;
                                 financeItem.Contractors = item.Contractors;
                                 financeItem.ChargesIn = item.ChargesIn;
                                 financeItem.IT = item.IT;
+                                financeItem.GP = 1 - (financeItem.HeadCountCost + financeItem.ChargesIn + financeItem.Contractors) / financeItem.Revenue;
                                 DbEntityEntry<Project_Financial_Report> entry = context.Entry(financeItem);
                                 entry.State = EntityState.Modified;
                             }
@@ -401,6 +401,8 @@ namespace ProjectForecast_OA.Controllers
                     var project = context.projects.Select(x => x).Where(x => x.ProjectNo == projectViewModel.ProjectNo).FirstOrDefault();
                     var workday_Details = context.Consultant_Workday_Details.Select(x => x).Where(x => x.ProjectNo == project.ProjectNo).ToList();
                     var projectCosts = context.ProjectCosts.Select(x => x).Where(x => x.ProjectNo == projectViewModel.ProjectNo).ToList();
+                    //List<Consultant_Workday_Details> employeeOnProject = new List<Consultant_Workday_Details>();
+
 
                     project.CountryId = projectViewModel.Country.CountryId;
                     project.Consultant_Id = projectViewModel.Consultant.Consultant_Id;
@@ -412,36 +414,89 @@ namespace ProjectForecast_OA.Controllers
                     project.CloseDate = projectViewModel.CloseDate;
                     project.StartDate = projectViewModel.StartDate;
 
-                    foreach (var item in projectViewModel.Employees)
+                    if (projectViewModel.Employees != null)
                     {
-                        var added = false;
-                        for (int i = 0; i < workday_Details.Count; i++)
+                        foreach (var item in projectViewModel.Employees)
                         {
-                            if (item.Id == workday_Details[i].Id)
+                            var added = false;
+                            for (int i = 0; i < workday_Details.Count; i++)
                             {
-                                added = true;
-                                //workday_Details[i].WorkDays = item.WorkDays;
-                                context.Entry(workday_Details[i]).State = EntityState.Modified;
+                                if (item.Consultant_Name == workday_Details[i].Consultant_Name)
+                                {
+                                    foreach (PropertyInfo month in item.WorkingMonth.GetType().GetProperties())
+                                    {
+                                        //同一项数据
+                                        if (month.Name == workday_Details[i].Month)
+                                        {
+                                            added = true;
+                                            workday_Details[i].WorkDays = (int)month.GetValue(item.WorkingMonth);
+                                            context.Entry(workday_Details[i]).State = EntityState.Modified;
+                                        }
+                                    }
+
+                                }
                             }
-                        }
-                        if (!added)
-                        {
-                            //context.Consultant_Workday_Details.Add(item);
+                            if (!added)
+                            {
+                                foreach (PropertyInfo month in item.WorkingMonth.GetType().GetProperties())
+                                {
+                                    var cwd = new Consultant_Workday_Details
+                                    {
+                                        Consultant_Name = item.Consultant_Name,
+                                        Consultant_Id = item.Consultant_Id,
+                                        CostRate = item.CostRate,
+                                        Month = month.Name,
+                                        WorkDays = (int)month.GetValue(item.WorkingMonth),
+                                        ProjectNo = projectViewModel.ProjectNo,
+                                        Type = item.Type,
+                                        Year = DateTime.Now.Year.ToString()
+                                    };
+                                    workday_Details.Add(cwd);
+                                    context.Consultant_Workday_Details.Add(cwd);
+                                }
+
+                            }
+
+
                         }
                     }
+                    List<Project_Financial_Report> projectFinance = new List<Project_Financial_Report>();
+                    //if (projectViewModel.ProjectFinancList != null)
+                    //{
+                    //    projectFinance = projectViewModel.ProjectFinancList;
+                    //}
+                    //else
+                    //{
+                        var cc = from a in workday_Details
+                                 group a by a.Month into b
+                                 select new Project_Financial_Report
+                                 {
+                                     ProjectNo = projectViewModel.ProjectNo,
+                                     Month = b.Key,
+                                     Year = DateTime.Now.Year.ToString(),
+                                     HeadCountCost = b.Where(x => x.Type == "HC").Sum(x => x.WorkDays * x.CostRate * 8),
+                                     ChargesIn = b.Where(x => x.Type == "EX").Sum(x => x.WorkDays * x.CostRate * 8),
+                                     Contractors = b.Where(x => x.Type == "CO").Sum(x => x.WorkDays * x.CostRate * 8),
+                                 };
+                        projectFinance.AddRange(cc.ToList());
 
-                    foreach (var item in projectViewModel.ProjectFinancList)
+                    //}
+                    foreach (var item in projectFinance)
                     {
                         var added = false;
                         for (int i = 0; i < projectCosts.Count; i++)
                         {
-                            if (item.Id == projectCosts[i].Id)
+                            if (item.ProjectNo== projectCosts[i].ProjectNo&&item.Month==projectCosts[i].Month&&item.Year==projectCosts[i].Year)
                             {
                                 added = true;
+                                projectCosts[i].HeadCountCost = item.HeadCountCost;
+                                projectCosts[i].Contractors = item.Contractors;
+                                projectCosts[i].ChargesIn = item.ChargesIn;
                                 projectCosts[i].Expenses = item.Expenses;
                                 projectCosts[i].IT = item.IT;
                                 projectCosts[i].Materials = item.Materials;
                                 projectCosts[i].Revenue = item.Revenue;
+                                projectCosts[i].GP = 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
                                 context.Entry(projectCosts[i]).State = EntityState.Modified;
                             }
                         }
@@ -454,6 +509,50 @@ namespace ProjectForecast_OA.Controllers
 
                     DbEntityEntry<Project> entry = context.Entry(project);
                     entry.State = EntityState.Modified;
+                    context.SaveChanges();
+                }
+
+            }
+            catch (Exception e)
+            {
+
+            }
+            return null;
+        }
+
+        public ActionResult EditProjectFinance(List<Project_Financial_Report> projectFinancList)
+        {
+            try
+            {
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    var projectNo = projectFinancList.FirstOrDefault().ProjectNo;
+                    var projectCosts = context.ProjectCosts.Select(x => x).Where(x => x.ProjectNo == projectNo).ToList();
+
+
+                    foreach (var item in projectFinancList)
+                    {
+                        var added = false;
+                        for (int i = 0; i < projectCosts.Count; i++)
+                        {
+                            if (item.Id == projectCosts[i].Id)
+                            {
+                                added = true;
+                                projectCosts[i].Expenses = item.Expenses;
+                                projectCosts[i].IT = item.IT;
+                                projectCosts[i].Materials = item.Materials;
+                                projectCosts[i].Revenue = item.Revenue;
+                                projectCosts[i].GP = 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
+                                context.Entry(projectCosts[i]).State = EntityState.Modified;
+                            }
+                        }
+                        if (!added)
+                        {
+                            context.ProjectCosts.Add(item);
+                        }
+
+                    }
+
                     context.SaveChanges();
                 }
 

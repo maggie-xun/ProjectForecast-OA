@@ -6,8 +6,8 @@
                 <el-step title="Utilization"></el-step>
                 <el-step title="FinancialReport"></el-step>
             </el-steps>
-
-            <el-form ref="form" :model="form" label-width="120px" v-show="active==0">
+        <div v-show="active==0">
+            <el-form ref="form" :model="form" label-width="120px">
                 <el-form-item label="Country">
                     <el-select v-model="form.Country.CountryId" placeholder="Please Select a Country">
                         <el-option :label="country.CountryName" :value="country.CountryId" v-for='country in Country'>
@@ -29,8 +29,8 @@
                 </el-form-item>
                 <el-form-item label="Customer">
                     <el-select v-model="form.Customer.CustomerId" placeholder="">
-                        <el-option :label="customer.Customer_name" :value="customer.CustomerId"
-                            v-for='customer in customers'></el-option>
+                        <el-option :label="customer.Customer_name" :value="customer.CustomerId" v-for='customer in customers'>
+                        </el-option>
                     </el-select>
                 </el-form-item>
                 <el-form-item label="Type">
@@ -54,8 +54,11 @@
                     </el-date-picker>
                 </el-form-item>
             </el-form>
+            <el-button style="margin-top: 12px;" @click="basicInfoSave">Save and Next</el-button>
+        </div>
 
-            <div v-show="active==1">
+
+        <div v-show="active==1">
                 <span class="demonstration" style='font-weight:bold'>Select Consultants: </span>
                 <el-checkbox-group v-model="checkList" style="display:inline-block">
                     <el-checkbox :label="employee.Consultant_Name" v-for='employee in consultants'></el-checkbox>
@@ -107,9 +110,9 @@
                 </el-table>
 
                 <el-button style="margin-top: 12px;" @click="SaveEmployeeUtilization">Save and Next</el-button>
-            </div>
+        </div>
 
-            <div class="block" v-show="active==2">
+        <div class="block" v-show="active==2">
 
                 <el-table border :data="sumList" style="width: 100%">
                     <el-table-column prop="Month" label="Month" style="width:6vw;">
@@ -165,11 +168,11 @@
                         </template>
                     </el-table-column>
                 </el-table>
+                <el-button style="margin-top: 12px;" @click="Save">Save</el-button>
 
-                <!-- <el-button type="primary" @click='AddProject'>Add Project</el-button> -->
-            </div>
+        </div>
 
-            <el-button style="margin-top: 12px;" @click="next">{{word}}</el-button>
+           
         </div>
 
     </div>
@@ -257,6 +260,8 @@
 
             changeTimeSpan() {
                 var _vm = this;
+                _vm.form.StartDate=moment(this.timeSpan[0]).format('MM-DD-YYYY');
+                _vm.form.CloseDate=moment(this.timeSpan[1]).format('MM-DD-YYYY');
                 _vm.startMonth = parseInt(moment(this.timeSpan[0]).format('MM-DD-YYYY').split('-')[0]);
                 _vm.endMonth = parseInt(moment(this.timeSpan[1]).format('MM-DD-YYYY').split('-')[0]);
             },
@@ -266,26 +271,25 @@
 
                 this.checkList.forEach(element => {
                     let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
-                    let workdays={};
+                    let workdays = {};
                     let exists = false;
                     for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
-                        let month=_vm.MonthMapping(i);
-                        workdays[month]=0;                                            
+                        let month = _vm.MonthMapping(i);
+                        workdays[month] = 0;
                     }
 
                     _vm.infiledList.forEach(utilization => {
-                            if (utilization.Consultant_Name == element) {
-                                exists = true;
-                            }
-                        })  
+                        if (utilization.Consultant_Name == element) {
+                            exists = true;
+                        }
+                    })
 
-                    if(!exists){
+                    if (!exists) {
                         this.infiledList.push({
-                                Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type, 
-                                CostRate: consultant.CostRate,WorkingMonth:{...workdays}
-                            })
+                            Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type,
+                            CostRate: consultant.CostRate, WorkingMonth: { ...workdays }
+                        })
                     }
-
                 });
             },
             getProperty(list, property, value) {
@@ -308,46 +312,46 @@
                 });
             },
 
-            next() {
+            Save() {
                 var _vm = this;
-                if (this.active <= 2) 
-                {
-                    if (_vm.active == 0) {
-                        for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
-                            let month = _vm.MonthMapping(i);
-                            _vm.columnShow.push(month);
+                if (this.active <= 2) {
+                    if (this.active == 2) {
+
+                        let project = this.form;
+                        project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
+                        project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
+
+                        project.ProjectFinancList = _vm.sumList;
+                        for (let j in project.ProjectFinancList) {
+                            //已存在，编辑
+                            if (!project.ProjectFinancList[j].Id) {
+                                project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
+                            }
                         }
+
+                        formData_service.default.addProjectFinance.extc(_vm.sumList)
                     }
-
-                if (this.active == 2) {
-
-                    let project = this.form;
-                    project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
-                    project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
-
-                    project.ProjectFinancList = _vm.sumList;
-                    for (let j in project.ProjectFinancList) {
-                        //已存在，编辑
-                        if (!project.ProjectFinancList[j].Id) {
-                            project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
-                        }
-                    }
-
-                    formData_service.default.addProjectFinance.extc(_vm.sumList)
+                    this.active++;
+                    this.$router.push({
+                        name: 'project_list',
+                    })
+                }
+            },
+            basicInfoSave() {
+                var _vm = this;
+                for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                    let month = _vm.MonthMapping(i);
+                    _vm.columnShow.push(month);
                 }
                 this.active++;
-                }               
             },
-
             SaveEmployeeUtilization(){
                 var _vm = this;
               
                 let project = _vm.form;
-                project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
-                project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
+
                 project.Employees = _vm.infiledList;
 
-                // _vm.sum(_vm.infiledList);
                 formData_service.default.addProject.extc(project).then(function (res) {
                     if (res.data != "") {
                         formData_service.default.getProjectFinance.exec(project.ProjectNo)
@@ -361,8 +365,8 @@
                     else {
                         this.$message('The Project is already exists');
                         this.$router.push({
-                            name: 'project_add',
-                        })
+          name: 'project_add',
+        })
                     }
                 }).catch(err => {
                     this.$message(err.status);

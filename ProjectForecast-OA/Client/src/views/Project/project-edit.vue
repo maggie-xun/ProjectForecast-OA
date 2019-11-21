@@ -6,55 +6,58 @@
                 <el-step title="Utilization"></el-step>
                 <el-step title="FinancialReport"></el-step>
             </el-steps>
-
-            <el-form ref="form" :model="form" label-width="120px" v-show="active==0">
-                <el-form-item label="Country">
-                    <el-select v-model="form.Country.CountryId" placeholder="Please Select a Country">
-                        <el-option :label="country.CountryName" :value="country.CountryId" v-for='country in Countries'>
-                        </el-option>
-                    </el-select>
-                    <el-button type="text" @click="open">Add Country</el-button>
-                </el-form-item>
-                <el-form-item label="Project Number">
-                    <el-input v-model="form.ProjectNo"></el-input>
-                </el-form-item>
-                <el-form-item label="Project Name">
-                    <el-input v-model="form.ProjectName"></el-input>
-                </el-form-item>
-                <el-form-item label="Project Manager" label-width="121px">
-                    <el-select v-model="form.Consultant.Consultant_Id" placeholder="">
-                        <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_Id"
-                            v-for='consultant in consultants'></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="Customer">
-                    <el-select v-model="form.Customer.CustomerId" placeholder="">
-                        <el-option :label="customer.Customer_name" :value="customer.CustomerId"
-                            v-for='customer in customers'></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="Type">
-                    <el-select v-model="form.Type" placeholder="">
-                        <el-option label="P" value="P"></el-option>
-                        <el-option label="O" value="O"></el-option>
-                        <el-option label="R" value="R"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="Status">
-                    <el-select v-model="form.Status" placeholder="">
-                        <el-option label="Scheduled" value="Scheduled"></el-option>
-                        <el-option label="Ongoning" value="Ongoning"></el-option>
-                        <el-option label="Completed" value="Completed"></el-option>
-                        <el-option label="Cancelled" value="Cancelled"></el-option>
-                    </el-select>
-                </el-form-item>
-                <el-form-item label="Select Time Span:">
-                    <el-date-picker v-model="timeSpan" type="daterange" range-separator="To" start-placeholder="Start"
-                        end-placeholder="End" @change='changeTimeSpan'>
-                    </el-date-picker>
-                </el-form-item>
-            </el-form>
-
+            <div v-show="active==0">
+                <el-form ref="form" :model="form" label-width="120px">
+                    <el-form-item label="Country">
+                        <el-select v-model="form.Country.CountryId" placeholder="Please Select a Country">
+                            <el-option :label="country.CountryName" :value="country.CountryId" v-for='country in Countries'>
+                            </el-option>
+                        </el-select>
+                        <el-button type="text" @click="open">Add Country</el-button>
+                    </el-form-item>
+                    <el-form-item label="Project Number">
+                        <el-input v-model="form.ProjectNo"></el-input>
+                    </el-form-item>
+                    <el-form-item label="Project Name">
+                        <el-input v-model="form.ProjectName"></el-input>
+                    </el-form-item>
+                    <el-form-item label="Project Manager" label-width="121px">
+                        <el-select v-model="form.Consultant.Consultant_Id" placeholder="">
+                            <el-option :label="consultant.Consultant_Name" :value="consultant.Consultant_Id"
+                                v-for='consultant in consultants'></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Customer">
+                        <el-select v-model="form.Customer.CustomerId" placeholder="">
+                            <el-option :label="customer.Customer_name" :value="customer.CustomerId"
+                                v-for='customer in customers'>
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Type">
+                        <el-select v-model="form.Type" placeholder="">
+                            <el-option label="P" value="P"></el-option>
+                            <el-option label="O" value="O"></el-option>
+                            <el-option label="R" value="R"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Status">
+                        <el-select v-model="form.Status" placeholder="">
+                            <el-option label="Scheduled" value="Scheduled"></el-option>
+                            <el-option label="Ongoning" value="Ongoning"></el-option>
+                            <el-option label="Completed" value="Completed"></el-option>
+                            <el-option label="Cancelled" value="Cancelled"></el-option>
+                        </el-select>
+                    </el-form-item>
+                    <el-form-item label="Select Time Span:">
+                        <el-date-picker v-model="timeSpan" type="daterange" range-separator="To" start-placeholder="Start"
+                            end-placeholder="End" @change='changeTimeSpan'>
+                        </el-date-picker>
+                    </el-form-item>
+                </el-form>
+                <el-button style="margin-top: 12px;" @click="basicInfoSave">Save and Next</el-button>
+            </div>
+    
             <div v-show="active==1">
                 <span class="demonstration" style='font-weight:bold'>Select Consultants: </span>
                 <el-checkbox-group v-model="checkList" style="display:inline-block">
@@ -71,11 +74,6 @@
                             </el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="Month" label="Month" style="width:6vw;">
-                        <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.Month" disabled="disabled"></el-input>
-                        </template>
-                    </el-table-column>
                     <el-table-column prop="Type" label="Type">
                         <template scope="scope">
                             <el-input size="mini" v-model="scope.row.Type" disabled="disabled"></el-input>
@@ -86,11 +84,16 @@
                             <el-input size="mini" v-model="scope.row.CostRate" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="CostRate" label="WorkDays">
+                    <el-table-column prop="item" :label="item" v-for="(item,i) in columnShow">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
+                            <el-input size="mini" v-model="scope.row.WorkingMonth[item]"></el-input>
                         </template>
                     </el-table-column>
+                    <!-- <el-table-column prop="WorkDays" label="WorkDays">
+                            <template scope="scope">
+                                <el-input size="mini" v-model="scope.row.WorkDays"></el-input>
+                            </template>
+                        </el-table-column> -->
                     <el-table-column fixed="right" label="Operation">
                         <template slot-scope="scope">
                             <el-button @click.native.prevent="deleteRow(scope.$index, infiledList,scope.row.Id)"
@@ -99,8 +102,10 @@
                         </template>
                     </el-table-column>
                 </el-table>
+    
+                <el-button style="margin-top: 12px;" @click="SaveEmployeeUtilization">Save and Next</el-button>
             </div>
-
+    
             <div class="block" v-show="active==2">
                 <el-table border :data="sumList" style="width: 100%">
                     <el-table-column prop="Month" label="Month" style="width:6vw;">
@@ -110,22 +115,17 @@
                     </el-table-column>
                     <el-table-column prop="HeadCountCost" label="HeadCountCost" style="width:6vw;">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.HeadCountCost"></el-input>
+                            <el-input size="mini" v-model="scope.row.HeadCountCost" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="ChargesIn" label="ChargesIn" style="width:6vw;">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.ChargesIn"></el-input>
+                            <el-input size="mini" v-model="scope.row.ChargesIn" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="Contractors" label="Contractors" style="width:6vw;">
                         <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.Contractors"></el-input>
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="GP" label="GP" style="width:6vw;">
-                        <template scope="scope">
-                            <el-input size="mini" v-model="scope.row.GP"></el-input>
+                            <el-input size="mini" v-model="scope.row.Contractors" disabled="disabled"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column prop="Revenue" label="Revenue" style="width:6vw;">
@@ -148,21 +148,23 @@
                             <el-input size="mini" v-model="scope.row.Materials"></el-input>
                         </template>
                     </el-table-column>
-
+                    <el-table-column prop="GP" label="GP" style="width:6vw;">
+                            <template scope="scope">
+                                <el-input size="mini" v-model="scope.row.GP"></el-input>
+                            </template>
+                        </el-table-column>
                     <el-table-column fixed="right" label="Operation">
                         <template slot-scope="scope">
-                            <el-button
-                                @click.native.prevent="deleteFinanceRow(scope.$index, FinancialReport,scope.row.Id)"
+                            <el-button @click.native.prevent="deleteFinanceRow(scope.$index, FinancialReport,scope.row.Id)"
                                 size="small"> Remove
                             </el-button>
                         </template>
                     </el-table-column>
                 </el-table>
+                <el-button style="margin-top: 12px;" @click="Save">Save</el-button>
             </div>
-
-            <el-button style="margin-top: 12px;" @click="next">{{word}}</el-button>
         </div>
-
+    
     </div>
 </template>
 <script>
@@ -188,7 +190,8 @@
                 loading: false,
                 sumList: [],
                 active: 0,
-                word: 'Next'
+                word: 'Next',
+                columnShow:[]
             }
         },
         created() {
@@ -239,6 +242,13 @@
             next() {
                 var _vm = this;
                 if (this.active <= 2) {
+
+                    if (_vm.active == 0) {
+                        for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                            let month = _vm.MonthMapping(i);
+                            _vm.columnShow.push(month);
+                        }
+                    }
                     if (this.active == 1) {
                         _vm.sum(_vm.infiledList);
                         _vm.word = 'Save';
@@ -280,32 +290,29 @@
             },
             addEmployee() {
                 var _vm = this;
-                let warning = false;
-                for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
-                    this.checkList.forEach(element => {
-                        let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
-                        let exists = false;
-                        _vm.infiledList.forEach(utilization => {
-                            if (utilization.Consultant_Name == element && utilization.Month == _vm.MonthMapping(i)) {
-                                exists = true;
-                                warning = true;
-                            }
-                        })
-                        if (!exists) {
-                            this.infiledList.push({
-                                Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type, CostRate: consultant.CostRate, Month: _vm.MonthMapping(i)
-                            })
-                        }
-                    });
-                }
 
-                if (warning) {
-                    console.log('已存在');
-                    this.$message({
-                        message: 'The item is already exits, please try another one',
-                        type: 'warning'
-                    });
-                }
+                this.checkList.forEach(element => {
+                    let consultant = _vm.getProperty(this.consultants, 'Consultant_Name', element);
+                    let workdays = {};
+                    let exists = false;
+                    for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                        let month = _vm.MonthMapping(i);
+                        workdays[month] = 0;
+                    }
+
+                    _vm.infiledList.forEach(utilization => {
+                        if (utilization.Consultant_Name == element) {
+                            exists = true;
+                        }
+                    })
+
+                    if (!exists) {
+                        this.infiledList.push({
+                            Consultant_Id: consultant.Consultant_Id, Consultant_Name: consultant.Consultant_Name, Type: consultant.Type,
+                            CostRate: consultant.CostRate, WorkingMonth: { ...workdays }
+                        })
+                    }
+                });
             },
             changeTimeSpan() {
                 var _vm = this;
@@ -483,8 +490,58 @@
 
             },
 
+            Save() {
+                var _vm = this;
+                if (this.active <= 2) {
+                    if (this.active == 2) {
 
-            
+                        let project = this.form;
+                        project.StartDate = moment(project.StartDate).format('MM-DD-YYYY');
+                        project.CloseDate = moment(project.CloseDate).format('MM-DD-YYYY');
+
+                        project.ProjectFinancList = _vm.sumList;
+                        for (let j in project.ProjectFinancList) {
+                            //已存在，编辑
+                            if (!project.ProjectFinancList[j].Id) {
+                                project.ProjectFinancList[j].ProjectNo = _vm.form.ProjectNo;
+                            }
+                        }
+
+                        formData_service.default.editProjectFinance.extc(_vm.sumList)
+                    }
+                    this.active++;
+                    this.$router.push({
+                        name: 'project_list',
+                    })
+                }
+            },
+            basicInfoSave() {
+                var _vm = this;
+                for (let i = _vm.startMonth; i <= _vm.endMonth; i++) {
+                    let month = _vm.MonthMapping(i);
+                    _vm.columnShow.push(month);
+                }
+                this.active++;
+            },
+            SaveEmployeeUtilization(){
+                var _vm = this;
+              
+                let project = _vm.form;
+
+                project.Employees = _vm.infiledList;
+
+                formData_service.default.editProject.extc(project).then(function (res) {
+
+                        formData_service.default.getProjectFinance.exec(project.ProjectNo)
+                            .then(data => {
+                                _vm.sumList = data.data;
+                                _vm.active = 2;
+                            })
+                   
+                }).catch(err => {
+                    this.$message(err.status);
+                })
+            }
         }
     }
 </script>
