@@ -96,7 +96,7 @@
                         </el-table-column> -->
                     <el-table-column fixed="right" label="Operation">
                         <template slot-scope="scope">
-                            <el-button @click.native.prevent="deleteRow(scope.$index, infiledList,scope.row.Id)"
+                            <el-button @click.native.prevent="deleteRow(scope.$index, infiledList,scope.row)"
                                 size="small"> Remove
                             </el-button>
                         </template>
@@ -249,10 +249,6 @@
                             _vm.columnShow.push(month);
                         }
                     }
-                    if (this.active == 1) {
-                        _vm.sum(_vm.infiledList);
-                        _vm.word = 'Save';
-                    }
                     if (this.active == 2) {
                         var _vm = this;
                         let project = this.form;
@@ -382,9 +378,9 @@
                 }
             },
 
-            deleteRow(index, rows, rowId) {//删除改行
+            deleteRow(index, rows, row) {//删除改行
                 rows.splice(index, 1);
-                formData_service.default.deleteEmployeeWorkdayDetail.exec(rowId)
+                formData_service.default.deleteEmployeeWorkdayDetail.exec(row)
             },
             deleteFinanceRow(index, rows, rowId) {
                 rows.splice(index, 1);

@@ -29,6 +29,8 @@ namespace ProjectForecast_OA.Models
             {
                 WorkingUtilizationViewModel workingUtilization = new WorkingUtilizationViewModel();
                 workingUtilization.ProjectNo = item.FirstOrDefault().ProjectNo;
+                workingUtilization.Consultant_Id = item.FirstOrDefault().Consultant_Id;
+                workingUtilization.Year = item.FirstOrDefault().Year;
                 workingUtilization.Consultant_Name = item.FirstOrDefault().Consultant_Name;
                 workingUtilization.Type = item.FirstOrDefault().Type;
                 workingUtilization.CostRate = item.FirstOrDefault().CostRate;

@@ -100,7 +100,7 @@ namespace ProjectForecast_OA.Controllers
                                 financeItem.Contractors = item.Contractors;
                                 financeItem.ChargesIn = item.ChargesIn;
                                 financeItem.IT = item.IT;
-                                financeItem.GP = 1 - (financeItem.HeadCountCost + financeItem.ChargesIn + financeItem.Contractors) / financeItem.Revenue;
+                                financeItem.GP = financeItem.Revenue==0?0:1 - (financeItem.HeadCountCost + financeItem.ChargesIn + financeItem.Contractors) / financeItem.Revenue;
                                 DbEntityEntry<Project_Financial_Report> entry = context.Entry(financeItem);
                                 entry.State = EntityState.Modified;
                             }
@@ -496,7 +496,7 @@ namespace ProjectForecast_OA.Controllers
                                 projectCosts[i].IT = item.IT;
                                 projectCosts[i].Materials = item.Materials;
                                 projectCosts[i].Revenue = item.Revenue;
-                                projectCosts[i].GP = 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
+                                projectCosts[i].GP = projectCosts[i].Revenue==0?0: 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
                                 context.Entry(projectCosts[i]).State = EntityState.Modified;
                             }
                         }
@@ -542,7 +542,7 @@ namespace ProjectForecast_OA.Controllers
                                 projectCosts[i].IT = item.IT;
                                 projectCosts[i].Materials = item.Materials;
                                 projectCosts[i].Revenue = item.Revenue;
-                                projectCosts[i].GP = 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
+                                projectCosts[i].GP = projectCosts[i].Revenue==0?0: 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
                                 context.Entry(projectCosts[i]).State = EntityState.Modified;
                             }
                         }
@@ -587,14 +587,66 @@ namespace ProjectForecast_OA.Controllers
                 return Json(customers, JsonRequestBehavior.AllowGet);
             }
         }
-        public ActionResult DeleteEmployeeWorkdayDetail(int id)
+        public ActionResult DeleteEmployeeWorkdayDetail(WorkingUtilizationViewModel workingViewModel)
         {
             using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
             {
-                var consultant = context.Consultant_Workday_Details.Select(x => x).Where(x => x.Id == id).FirstOrDefault();
-                context.Consultant_Workday_Details.Remove(consultant);
-                context.SaveChanges();
-                return Json(consultant, JsonRequestBehavior.AllowGet);
+                foreach (PropertyInfo month in workingViewModel.WorkingMonth.GetType().GetProperties())
+                {
+                    var consultant = context.Consultant_Workday_Details.Select(x => x).Where(x => x.ProjectNo == workingViewModel.ProjectNo & x.Year == workingViewModel.Year & x.Consultant_Id == workingViewModel.Consultant_Id & x.Month == month.Name).FirstOrDefault();
+                    if (consultant != null)
+                    {
+                        context.Consultant_Workday_Details.Remove(consultant);
+                        context.SaveChanges();
+                    }
+
+                }
+
+                List<Project_Financial_Report> projectFinance = new List<Project_Financial_Report>();
+
+                var projectCosts = context.ProjectCosts.Select(x => x).Where(x => x.ProjectNo == workingViewModel.ProjectNo).ToList();
+                var workday_Details = context.Consultant_Workday_Details.Select(x => x).Where(x => x.ProjectNo == workingViewModel.ProjectNo).ToList();
+                var cc = from a in workday_Details
+                         group a by a.Month into b
+                         select new Project_Financial_Report
+                         {
+                             ProjectNo = workingViewModel.ProjectNo,
+                             Month = b.Key,
+                             Year = DateTime.Now.Year.ToString(),
+                             HeadCountCost = b.Where(x => x.Type == "HC").Sum(x => x.WorkDays * x.CostRate * 8),
+                             ChargesIn = b.Where(x => x.Type == "EX").Sum(x => x.WorkDays * x.CostRate * 8),
+                             Contractors = b.Where(x => x.Type == "CO").Sum(x => x.WorkDays * x.CostRate * 8),
+                         };
+                projectFinance.AddRange(cc.ToList());
+
+                //}
+                foreach (var item in projectFinance)
+                {
+                    var added = false;
+                    for (int i = 0; i < projectCosts.Count; i++)
+                    {
+                        if (item.ProjectNo == projectCosts[i].ProjectNo && item.Month == projectCosts[i].Month && item.Year == projectCosts[i].Year)
+                        {
+                            added = true;
+                            projectCosts[i].HeadCountCost = item.HeadCountCost;
+                            projectCosts[i].Contractors = item.Contractors;
+                            projectCosts[i].ChargesIn = item.ChargesIn;
+                            projectCosts[i].Expenses = item.Expenses;
+                            projectCosts[i].IT = item.IT;
+                            projectCosts[i].Materials = item.Materials;
+                            projectCosts[i].Revenue = item.Revenue;
+                            projectCosts[i].GP = projectCosts[i].Revenue==0?0: 1 - (projectCosts[i].HeadCountCost + projectCosts[i].ChargesIn + projectCosts[i].Contractors) / projectCosts[i].Revenue;
+                            context.Entry(projectCosts[i]).State = EntityState.Modified;
+                        }
+                    }
+                    if (!added)
+                    {
+                        context.ProjectCosts.Add(item);
+                    }
+
+                    context.SaveChanges();
+                }
+                return Json(workingViewModel, JsonRequestBehavior.AllowGet);
             }
         }
 
@@ -1092,5 +1144,35 @@ namespace ProjectForecast_OA.Controllers
                 return null;
             }
         }
+
+        //public ActionResult GetLTF()
+        //{
+        //    try
+        //    {
+        //        using(EFCodeFirstDbContext context=new EFCodeFirstDbContext())
+        //        {
+        //            var projectCost = context.ProjectCosts.Select(x => x).ToList();
+        //            var total = from a in projectCost
+        //                        group a by a.Month into b
+        //                        select new {
+        //                            Month = b.Key,
+        //                            Revenue =b.Sum(x=>x.Revenue),
+        //                            ChargesIn=b.Sum(x=>x.ChargesIn),
+        //                            Contractors=b.Sum(x=>x.Contractors),
+        //                            HeadCountCost=b.Sum(x=>x.HeadCountCost),
+        //                            Expenses=b.Sum(x=>x.Expenses),
+        //                            IT=b.Sum(x=>x.IT),
+        //                            Materials=b.Sum(x=>x.Materials),
+        //                            //ChargesOut   通过Utilization计算
+        //                            //TotalCost= b.Sum(x => x.ChargesIn)+ b.Sum(x => x.Contractors)+ b.Sum(x => x.HeadCountCost)+ b.Sum(x => x.Expenses)+ b.Sum(x => x.IT)+ b.Sum(x => x.Materials)-b.Sum(x => x.ChargesOut)
+        //                            GP =
+        //                        };
+
+        //        }
+        //    }catch(Exception e)
+        //    {
+
+        //    }
+        //}
     }
 }

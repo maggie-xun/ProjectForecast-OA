@@ -170,12 +170,8 @@ export default {
     url() {
       return `${host}/ProjectForecast/DeleteEmployeeWorkdayDetail`;
     },
-    exec: function(id) {
-      return axios.get(this.url(), {
-        params: {
-          id: id
-        }
-      });
+    exec: function(workingViewModel) {
+      return axios.post(this.url(),workingViewModel);
     }
   },
   deleteFinance:{

@@ -28,9 +28,9 @@
                                 <router-link to="/employee_list">Empoyee List</router-link>
                             </el-menu-item>                   
                     </el-submenu>
-                    <el-menu-item index="employee_timesheet">
+                    <!-- <el-menu-item index="employee_timesheet">
                         <router-link to="/employee_timesheet">Time Sheet</router-link>                      
-                    </el-menu-item>
+                    </el-menu-item> -->
                     <el-submenu index='customer_add'>
                         <template slot="title">Customer</template>
                         <el-menu-item index='customer_add'>
