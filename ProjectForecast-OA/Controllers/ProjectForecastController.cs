@@ -1145,34 +1145,37 @@ namespace ProjectForecast_OA.Controllers
             }
         }
 
-        //public ActionResult GetLTF()
-        //{
-        //    try
-        //    {
-        //        using(EFCodeFirstDbContext context=new EFCodeFirstDbContext())
-        //        {
-        //            var projectCost = context.ProjectCosts.Select(x => x).ToList();
-        //            var total = from a in projectCost
-        //                        group a by a.Month into b
-        //                        select new {
-        //                            Month = b.Key,
-        //                            Revenue =b.Sum(x=>x.Revenue),
-        //                            ChargesIn=b.Sum(x=>x.ChargesIn),
-        //                            Contractors=b.Sum(x=>x.Contractors),
-        //                            HeadCountCost=b.Sum(x=>x.HeadCountCost),
-        //                            Expenses=b.Sum(x=>x.Expenses),
-        //                            IT=b.Sum(x=>x.IT),
-        //                            Materials=b.Sum(x=>x.Materials),
-        //                            //ChargesOut   通过Utilization计算
-        //                            //TotalCost= b.Sum(x => x.ChargesIn)+ b.Sum(x => x.Contractors)+ b.Sum(x => x.HeadCountCost)+ b.Sum(x => x.Expenses)+ b.Sum(x => x.IT)+ b.Sum(x => x.Materials)-b.Sum(x => x.ChargesOut)
-        //                            GP =
-        //                        };
+        public ActionResult GetLTF()
+        {
+            try
+            {
+                using (EFCodeFirstDbContext context = new EFCodeFirstDbContext())
+                {
+                    var projectCost = context.ProjectCosts.Select(x => x).ToList();
+                    var total = from a in projectCost
+                                group a by a.Month into b
+                                select new
+                                {
+                                    Month = b.Key,
+                                    Revenue = b.Sum(x => x.Revenue),
+                                    ChargesIn = b.Sum(x => x.ChargesIn),
+                                    Contractors = b.Sum(x => x.Contractors),
+                                    HeadCountCost = b.Sum(x => x.HeadCountCost),
+                                    Expenses = b.Sum(x => x.Expenses),
+                                    IT = b.Sum(x => x.IT),
+                                    Materials = b.Sum(x => x.Materials),
+                                    //ChargesOut   通过Utilization计算
+                                    //TotalCost= b.Sum(x => x.ChargesIn)+ b.Sum(x => x.Contractors)+ b.Sum(x => x.HeadCountCost)+ b.Sum(x => x.Expenses)+ b.Sum(x => x.IT)+ b.Sum(x => x.Materials)-b.Sum(x => x.ChargesOut)
+                                    //GP =
+                                };
+                    return Json(total, JsonRequestBehavior.AllowGet);
 
-        //        }
-        //    }catch(Exception e)
-        //    {
-
-        //    }
-        //}
+                }
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
 }

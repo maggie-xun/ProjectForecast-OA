@@ -378,6 +378,17 @@ editProjectFinance:{
       console.log(data);
     });
   }
+},
+
+getLTF:{
+  url() {
+    return `${host}/ProjectForecast/GetLTF`;
+  },
+  exec: function(projectNo) {
+
+    return axios.get(this.url());
+  
+  }
 }
 };
 //然后再修改原型链
